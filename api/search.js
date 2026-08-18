@@ -147,8 +147,11 @@ async function searchRegionCombined(session, params) {
 
   const merged = new Map();
 
+  // insttId는 해당 타입(숙소/야영장)의 재고가 0이면 예약 버튼 자체가 안 나와서
+  // 파싱이 실패해 빈 문자열이 되는 경우가 있다. 그래서 병합 키는 항상
+  // "지역:시설명"으로 고정한다 (같은 지역 안에서 시설명은 유일).
   function keyOf(item) {
-    return item.insttId || `${item.region}:${item.name}`;
+    return `${item.region}:${item.name}`;
   }
 
   for (const h of houseItems) {
@@ -166,6 +169,8 @@ async function searchRegionCombined(session, params) {
     if (existing) {
       existing.campAvailable = c.available;
       existing.campRoomCount = c.roomCount;
+      // insttId가 house 쪽에서 비어있었다면 camp 쪽 값으로 보완
+      if (!existing.insttId && c.insttId) existing.insttId = c.insttId;
     } else {
       merged.set(key, {
         ...c,
