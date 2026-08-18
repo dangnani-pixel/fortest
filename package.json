@@ -1,0 +1,9 @@
+{
+  "name": "forest-vacancy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "전국 국립 자연휴양림 야영장/숙소 빈자리(예약가능 현황) 실시간 조회",
+  "dependencies": {
+    "cheerio": "^1.0.0"
+  }
+}

@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>자연휴양림 빈자리 조회</title>
+<style>
+  :root{
+    --bg:#f6f4ee;
+    --card:#ffffff;
+    --ink:#1f2a20;
+    --muted:#6b7568;
+    --line:#e3e0d5;
+    --green:#2f7d4f;
+    --green-bg:#e6f4ea;
+    --red:#b3432b;
+    --red-bg:#faeae6;
+    --accent:#2f7d4f;
+    --accent-ink:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+  }
+  header{
+    padding:28px 20px 18px;
+    text-align:center;
+  }
+  header h1{
+    margin:0 0 6px;
+    font-size:1.6rem;
+  }
+  header p{
+    margin:0;
+    color:var(--muted);
+    font-size:0.92rem;
+  }
+  .warn{
+    max-width:720px;
+    margin:0 auto 18px;
+    padding:10px 14px;
+    background:#fff8e6;
+    border:1px solid #f0d98a;
+    border-radius:10px;
+    font-size:0.82rem;
+    color:#7a5b00;
+    text-align:center;
+  }
+  form{
+    max-width:900px;
+    margin:0 auto;
+    padding:16px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:flex-end;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    flex:1 1 140px;
+  }
+  .field label{
+    font-size:0.78rem;
+    color:var(--muted);
+  }
+  .field select, .field input{
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:0.92rem;
+    background:#fff;
+  }
+  button{
+    padding:10px 22px;
+    border:none;
+    border-radius:8px;
+    background:var(--accent);
+    color:var(--accent-ink);
+    font-size:0.95rem;
+    font-weight:600;
+    cursor:pointer;
+    flex:0 0 auto;
+  }
+  button:disabled{ opacity:0.6; cursor:progress; }
+
+  .status-line{
+    max-width:900px;
+    margin:14px auto 0;
+    padding:0 4px;
+    font-size:0.86rem;
+    color:var(--muted);
+    min-height:1.2em;
+  }
+
+  .grid{
+    max-width:900px;
+    margin:14px auto 60px;
+    padding:0 4px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px,1fr));
+    gap:14px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .card .thumb{
+    width:100%;
+    height:130px;
+    object-fit:cover;
+    background:#eee;
+  }
+  .card .body{
+    padding:12px 14px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex:1;
+  }
+  .badge-row{
+    display:flex;
+    gap:6px;
+    align-items:center;
+  }
+  .badge{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:0.72rem;
+    font-weight:600;
+  }
+  .badge.type{ background:#eef0e9; color:var(--muted); }
+  .badge.ok{ background:var(--green-bg); color:var(--green); }
+  .badge.no{ background:var(--red-bg); color:var(--red); }
+
+  .name{ font-size:1.02rem; font-weight:700; margin:2px 0; }
+  .meta{ font-size:0.8rem; color:var(--muted); line-height:1.4; }
+  .roomcount{ font-size:0.86rem; font-weight:600; }
+  .roomcount.ok{ color:var(--green); }
+  .roomcount.no{ color:var(--muted); }
+
+  .links{
+    margin-top:auto;
+    display:flex;
+    gap:8px;
+    padding-top:8px;
+  }
+  .links a{
+    flex:1;
+    text-align:center;
+    font-size:0.78rem;
+    padding:7px 0;
+    border-radius:7px;
+    text-decoration:none;
+    border:1px solid var(--line);
+    color:var(--ink);
+  }
+  .links a.primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+
+  .empty, .error{
+    max-width:900px;
+    margin:30px auto;
+    text-align:center;
+    color:var(--muted);
+    font-size:0.9rem;
+  }
+  .error{ color:var(--red); }
+
+  footer{
+    text-align:center;
+    padding:20px;
+    color:var(--muted);
+    font-size:0.76rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌲 자연휴양림 빈자리 조회</h1>
+  <p>지역과 날짜를 고르면, 숲나들e 실시간 예약 현황을 모아서 보여드려요.</p>
+</header>
+
+<div class="warn">
+  이 페이지는 산림청 공식 서비스가 아닌 비공식 도구입니다. 실제 예약은 반드시
+  <a href="https://www.foresttrip.go.kr" target="_blank" rel="noopener">숲나들e</a>에서 진행해 주세요.
+</div>
+
+<form id="searchForm">
+  <div class="field">
+    <label for="region">지역</label>
+    <select id="region" name="region">
+      <option value="all">전국 전체</option>
+      <option value="1">서울/인천/경기</option>
+      <option value="2">강원</option>
+      <option value="3">충북</option>
+      <option value="4">대전/충남</option>
+      <option value="5">전북</option>
+      <option value="6">전남/광주</option>
+      <option value="7">대구/경북</option>
+      <option value="8">부산/경남</option>
+      <option value="9">제주</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="start">입실일</label>
+    <input type="date" id="start" name="start" required />
+  </div>
+  <div class="field">
+    <label for="end">퇴실일</label>
+    <input type="date" id="end" name="end" required />
+  </div>
+  <div class="field" style="flex:0 0 90px;">
+    <label for="people">인원</label>
+    <input type="number" id="people" name="people" min="1" max="20" value="2" />
+  </div>
+  <button type="submit" id="submitBtn">빈자리 조회</button>
+</form>
+
+<div class="status-line" id="statusLine"></div>
+<div id="grid" class="grid"></div>
+
+<footer>
+  데이터 출처: 숲나들e(foresttrip.go.kr) · 비공식 조회 도구이며 실제 예약 가능 여부는 예약 시점 기준으로 달라질 수 있습니다.
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
