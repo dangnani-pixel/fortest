@@ -50,12 +50,14 @@ function renderItems(items) {
   }
 
   grid.innerHTML = items.map((item) => {
-    const statusClass = item.available ? 'ok' : 'no';
-    const statusLabel = item.status || (item.available ? '예약가능' : '예약불가');
+    // 예약가능 = 빈자리 있음 / 그 외 = 대기(마감)
+    const statusClass = item.available ? 'ok' : 'wait';
+    const statusLabel = item.available ? '빈자리' : '대기';
     const img = item.image || '';
-    const roomText = item.roomCount === null || item.roomCount === undefined
-      ? ''
-      : `잔여 ${item.roomCount}건`;
+    // 잔여 건수는 실제 빈자리가 있을 때만 표시 (마감/대기 상태에서는 0건이라 의미가 없음)
+    const roomText = item.available && item.roomCount !== null && item.roomCount !== undefined
+      ? `잔여 ${item.roomCount}건`
+      : '';
 
     return `
       <div class="card">
@@ -68,11 +70,8 @@ function renderItems(items) {
           <div class="name">${escapeHtml(item.name)}</div>
           <div class="meta">${escapeHtml(item.regionName || '')}${item.address ? ' · ' + escapeHtml(item.address) : ''}</div>
           ${item.facilities ? `<div class="meta">${escapeHtml(item.facilities)}</div>` : ''}
-          ${roomText ? `<div class="roomcount ${statusClass}">${roomText}</div>` : ''}
-          <div class="links">
-            ${item.homepage ? `<a href="${escapeHtml(item.homepage)}" target="_blank" rel="noopener">홈페이지</a>` : ''}
-            <a class="primary" href="https://www.foresttrip.go.kr/rep/or/fcfsRsrvtMain.do?hmpgId=FRIP&menuId=001001" target="_blank" rel="noopener">숲나들e에서 예약</a>
-          </div>
+          ${roomText ? `<div class="roomcount ok">${roomText}</div>` : ''}
+          ${item.homepage ? `<div class="links"><a href="${escapeHtml(item.homepage)}" target="_blank" rel="noopener">홈페이지</a></div>` : ''}
         </div>
       </div>
     `;
@@ -112,7 +111,7 @@ form.addEventListener('submit', async (e) => {
       throw new Error(data.error || `조회 실패 (HTTP ${resp.status})`);
     }
 
-    statusLine.textContent = `총 ${data.count}곳 중 예약가능 ${data.availableCount}곳`;
+    statusLine.textContent = `총 ${data.count}곳 중 빈자리 ${data.availableCount}곳`;
     renderItems(data.items);
   } catch (err) {
     statusLine.textContent = '';

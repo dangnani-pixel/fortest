@@ -15,6 +15,8 @@
     --green-bg:#e6f4ea;
     --red:#b3432b;
     --red-bg:#faeae6;
+    --amber:#9a6b12;
+    --amber-bg:#fbeed4;
     --accent:#2f7d4f;
     --accent-ink:#ffffff;
   }
@@ -143,13 +145,12 @@
   }
   .badge.type{ background:#eef0e9; color:var(--muted); }
   .badge.ok{ background:var(--green-bg); color:var(--green); }
-  .badge.no{ background:var(--red-bg); color:var(--red); }
+  .badge.wait{ background:var(--amber-bg); color:var(--amber); }
 
   .name{ font-size:1.02rem; font-weight:700; margin:2px 0; }
   .meta{ font-size:0.8rem; color:var(--muted); line-height:1.4; }
   .roomcount{ font-size:0.86rem; font-weight:600; }
   .roomcount.ok{ color:var(--green); }
-  .roomcount.no{ color:var(--muted); }
 
   .links{
     margin-top:auto;
@@ -166,11 +167,6 @@
     text-decoration:none;
     border:1px solid var(--line);
     color:var(--ink);
-  }
-  .links a.primary{
-    background:var(--accent);
-    border-color:var(--accent);
-    color:#fff;
   }
 
   .empty, .error{
