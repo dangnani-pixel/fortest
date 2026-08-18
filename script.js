@@ -54,10 +54,15 @@ function renderItems(items) {
     const statusClass = item.available ? 'ok' : 'wait';
     const statusLabel = item.available ? '빈자리' : '대기';
     const img = item.image || '';
-    // 잔여 건수는 실제 빈자리가 있을 때만 표시 (마감/대기 상태에서는 0건이라 의미가 없음)
-    const roomText = item.available && item.roomCount !== null && item.roomCount !== undefined
-      ? `잔여 ${item.roomCount}건`
-      : '';
+    // 잔여 건수는 숙소/야영장으로 나누어, 실제 빈자리가 있는 쪽만 표시
+    const roomParts = [];
+    if (item.houseAvailable && item.houseRoomCount) {
+      roomParts.push(`숙소 ${item.houseRoomCount}건`);
+    }
+    if (item.campAvailable && item.campRoomCount) {
+      roomParts.push(`야영장 ${item.campRoomCount}건`);
+    }
+    const roomText = roomParts.length ? `잔여 · ${roomParts.join(' / ')}` : '';
 
     return `
       <div class="card">

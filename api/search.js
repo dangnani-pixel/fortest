@@ -54,7 +54,7 @@ async function getSession() {
   return { cookieHeader, csrf: csrfMatch[1] };
 }
 
-async function searchRegion({ cookieHeader, csrf }, { region, start, end, people }) {
+async function searchRegion({ cookieHeader, csrf }, { region, start, end, people, houseCampSctin }) {
   const body = {
     srchInsttArcd: region,
     srchInsttId: '',
@@ -62,7 +62,7 @@ async function searchRegion({ cookieHeader, csrf }, { region, start, end, people
     srchRsrvtEdDt: end,
     srchStngNofpr: String(people || 2),
     srchSthngCnt: '1',
-    houseCampSctin: '',
+    houseCampSctin, // '01' = 숙박시설(휴양관), '02' = 야영장
     rsrvtPssblYn: '',
     srchHouseCharg: '',
     srchHouseOver: '',
@@ -138,6 +138,57 @@ async function searchRegion({ cookieHeader, csrf }, { region, start, end, people
   return items;
 }
 
+// 한 지역을 숙소(01)/야영장(02) 두 번 조회해서 시설(insttId) 기준으로 합친다.
+async function searchRegionCombined(session, params) {
+  const [houseItems, campItems] = await Promise.all([
+    searchRegion(session, { ...params, houseCampSctin: '01' }),
+    searchRegion(session, { ...params, houseCampSctin: '02' }),
+  ]);
+
+  const merged = new Map();
+
+  function keyOf(item) {
+    return item.insttId || `${item.region}:${item.name}`;
+  }
+
+  for (const h of houseItems) {
+    merged.set(keyOf(h), {
+      ...h,
+      houseAvailable: h.available,
+      houseRoomCount: h.roomCount,
+      campAvailable: false,
+      campRoomCount: 0,
+    });
+  }
+  for (const c of campItems) {
+    const key = keyOf(c);
+    const existing = merged.get(key);
+    if (existing) {
+      existing.campAvailable = c.available;
+      existing.campRoomCount = c.roomCount;
+    } else {
+      merged.set(key, {
+        ...c,
+        houseAvailable: false,
+        houseRoomCount: 0,
+        campAvailable: c.available,
+        campRoomCount: c.roomCount,
+      });
+    }
+  }
+
+  return Array.from(merged.values()).map((item) => {
+    const available = item.houseAvailable || item.campAvailable;
+    return {
+      ...item,
+      available,
+      status: available ? '예약가능' : '예약불가',
+      // roomCount(합계)는 정렬/하위호환용으로 남겨둔다.
+      roomCount: (item.houseRoomCount || 0) + (item.campRoomCount || 0),
+    };
+  });
+}
+
 module.exports = async (req, res) => {
   try {
     const { region = 'all', start, end, people } = req.query;
@@ -159,11 +210,12 @@ module.exports = async (req, res) => {
       return;
     }
 
-    const results = [];
-    for (const r of regionsToQuery) {
-      const items = await searchRegion(session, { region: r, start, end, people });
-      results.push(...items);
-    }
+    // 지역마다 숙소/야영장 2번씩 조회해야 해서(최대 9개 지역 x 2) 순차 처리하면 시간이 오래 걸린다.
+    // 같은 세션(쿠키+csrf)을 공유해 병렬로 호출해서 서버리스 함수 제한시간 안에 끝낸다.
+    const perRegion = await Promise.all(
+      regionsToQuery.map((r) => searchRegionCombined(session, { region: r, start, end, people })),
+    );
+    const results = perRegion.flat();
 
     // 예약가능 우선, 그 다음 잔여 객실 많은 순
     results.sort((a, b) => {
