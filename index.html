@@ -252,14 +252,21 @@
     font-weight:700;
     color:var(--muted);
   }
-  .notice-item{
+  .policy-text{
     font-size:0.78rem;
-    line-height:1.4;
+    line-height:1.5;
+    max-height:220px;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
   }
-  .notice-item a{ color:var(--ink); text-decoration:none; font-weight:600; }
-  .notice-item a:hover{ text-decoration:underline; }
-  .notice-item .notice-date{ color:var(--muted); font-size:0.72rem; margin-left:4px; }
-  .notice-item .notice-preview{ color:var(--muted); font-size:0.74rem; margin-top:2px; }
+  .policy-text p{ margin:0; }
+  .notice-source{
+    font-size:0.72rem;
+    margin-top:2px;
+  }
+  .notice-source a{ color:var(--muted); }
   .notice-empty{ font-size:0.76rem; color:var(--muted); }
   .remind-row{ display:flex; gap:6px; }
   .remind-row > *{ flex:1; min-width:0; }

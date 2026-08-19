@@ -131,7 +131,7 @@ function renderItems(items) {
           <button type="button" class="remind-toggle" data-target="${panelId}">🔔 예약 알림 등록</button>
           <div class="remind-panel" id="${panelId}" data-name="${escapeHtml(item.name)}" data-homepage="${escapeHtml(item.homepage || '')}">
             <div class="notice-box">
-              <div class="notice-label">📋 이 휴양림 최근 공지</div>
+              <div class="notice-label">📋 선착순 예약정책</div>
               <div class="notice-body notice-empty">불러오는 중…</div>
             </div>
             <div class="remind-row">
@@ -172,28 +172,17 @@ function renderItems(items) {
 
 function renderNotices(panel, data) {
   const body = panel.querySelector('.notice-body');
-  if (!data || (!data.notices?.length && !data.note)) {
+  if (!data || !data.paragraphs?.length) {
     body.className = 'notice-body notice-empty';
-    body.textContent = '공지사항을 가져오지 못했어요.';
-    return;
-  }
-  if (!data.notices.length) {
-    body.className = 'notice-body notice-empty';
-    body.textContent = data.note || '등록된 공지사항이 없어요.';
+    body.textContent = data?.note || '선착순 예약정책 안내를 가져오지 못했어요.';
     return;
   }
   body.className = 'notice-body';
-  body.innerHTML = data.notices
-    .map(
-      (n) => `
-      <div class="notice-item">
-        <a href="${escapeHtml(n.href)}" target="_blank" rel="noopener">${escapeHtml(n.title)}</a>
-        ${n.date ? `<span class="notice-date">${escapeHtml(n.date)}</span>` : ''}
-        ${n.preview ? `<div class="notice-preview">${escapeHtml(n.preview)}</div>` : ''}
-      </div>
-    `
-    )
-    .join('');
+  const textHtml = `<div class="policy-text">${data.paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join('')}</div>`;
+  const sourceHtml = data.sourceUrl
+    ? `<div class="notice-source"><a href="${escapeHtml(data.sourceUrl)}" target="_blank" rel="noopener">원문 보기 ↗</a></div>`
+    : '';
+  body.innerHTML = textHtml + sourceHtml;
 }
 
 async function loadNoticesOnce(panel) {
@@ -204,7 +193,7 @@ async function loadNoticesOnce(panel) {
   const body = panel.querySelector('.notice-body');
   if (!homepage) {
     body.className = 'notice-body notice-empty';
-    body.textContent = '홈페이지 정보가 없어 공지사항을 확인할 수 없어요.';
+    body.textContent = '홈페이지 정보가 없어 예약정책을 확인할 수 없어요.';
     return;
   }
 
@@ -214,7 +203,7 @@ async function loadNoticesOnce(panel) {
     renderNotices(panel, data);
   } catch {
     body.className = 'notice-body notice-empty';
-    body.textContent = '공지사항을 가져오는 중 오류가 발생했어요.';
+    body.textContent = '예약정책을 가져오는 중 오류가 발생했어요.';
   }
 }
 

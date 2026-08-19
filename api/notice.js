@@ -1,7 +1,10 @@
 // /api/notice.js
-// 특정 휴양림의 "공지사항" 최신 글을 가져온다.
-// 예약 오픈 규칙은 사용자가 직접 입력해야 하므로(정형 데이터가 없음),
-// 그 판단에 참고할 수 있도록 원문 공지를 그대로 보여주는 용도.
+// 특정 휴양림의 "선착순 예약정책" 안내 원문을 가져온다.
+// 예약 오픈 규칙(요일/시간 등)은 사용자가 직접 입력해야 하므로(정형 데이터가 없음),
+// 그 판단에 참고할 수 있도록 공식 정책 원문을 그대로 보여주는 용도.
+//
+// 숲나들e는 시설마다 hmpgId만 다르고 나머지 URL(menuId=004001001&ruleId=101)은
+// 공통이라, 이 조합으로 "선착순 예약정책" 페이지를 바로 찾을 수 있다.
 
 const cheerio = require('cheerio');
 
@@ -36,12 +39,6 @@ async function resolveHmpgId(homepage) {
   return m ? m[1] : null;
 }
 
-function absolutize(href) {
-  if (!href) return '';
-  if (/^https?:\/\//.test(href)) return href;
-  return BASE + (href.startsWith('/') ? href : `/${href}`);
-}
-
 module.exports = async (req, res) => {
   try {
     const { homepage } = req.query;
@@ -52,50 +49,37 @@ module.exports = async (req, res) => {
 
     const hmpgId = await resolveHmpgId(homepage);
     if (!hmpgId) {
-      res.status(200).json({ notices: [], sourceUrl: homepage, note: '공지사항 위치를 찾지 못했어요. 홈페이지에서 직접 확인해 주세요.' });
+      res.status(200).json({ paragraphs: [], sourceUrl: homepage, note: '예약정책 페이지 위치를 찾지 못했어요. 홈페이지에서 직접 확인해 주세요.' });
       return;
     }
 
-    const pageUrl = `${BASE}/indvz/main.do?hmpgId=${encodeURIComponent(hmpgId)}`;
+    const pageUrl = `${BASE}/pot/rm/ug/selectRsrvtGdncView.do?hmpgId=${encodeURIComponent(hmpgId)}&menuId=004001001&ruleId=101`;
     const resp = await fetch(pageUrl, { headers: { 'User-Agent': UA } });
     if (!resp.ok) {
-      res.status(200).json({ notices: [], sourceUrl: pageUrl, note: '공지사항을 가져오지 못했어요.' });
+      res.status(200).json({ paragraphs: [], sourceUrl: pageUrl, note: '선착순 예약정책 안내를 가져오지 못했어요.' });
       return;
     }
 
     const html = await resp.text();
     const $ = cheerio.load(html);
-    const notices = [];
 
-    // 패턴 A: 구형 슬라이더 스타일 (제목 + 본문 미리보기)
-    $('.notice_slider .noticeItem a').each((_, el) => {
-      if (notices.length >= 3) return;
-      const $el = $(el);
-      const title = $el.find('strong').text().trim();
-      const preview = $el.find('p').first().text().trim().slice(0, 140);
-      const href = absolutize($el.attr('href'));
-      if (title) notices.push({ title, preview, date: '', href });
+    const title = $('h3').first().text().trim();
+    const paragraphs = [];
+    $('.wd_txt p').each((_, el) => {
+      const t = $(el).text().replace(/\s+/g, ' ').trim();
+      if (t) paragraphs.push(t);
     });
 
-    // 패턴 B: 신형 숏컷 스타일 (제목 + 날짜만)
-    if (!notices.length) {
-      $('.ms_shortcut.notice .msh_pt a').each((_, el) => {
-        if (notices.length >= 3) return;
-        const $el = $(el);
-        const title = $el.find('.mp_txt').text().trim();
-        const date = $el.find('.mp_date').text().trim();
-        const href = absolutize($el.attr('href'));
-        if (title) notices.push({ title, preview: '', date, href });
-      });
-    }
+    const looksValid = /선착순/.test(title) || paragraphs.length > 0;
 
-    res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=3600');
+    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
     res.status(200).json({
-      notices,
+      title: title || '선착순 예약정책',
+      paragraphs: paragraphs.slice(0, 30),
       sourceUrl: pageUrl,
-      note: notices.length ? '' : '현재 등록된 공지사항이 없어요.',
+      note: looksValid ? '' : '이 휴양림은 선착순 예약정책 안내가 없어요. 홈페이지에서 직접 확인해 주세요.',
     });
   } catch (err) {
-    res.status(200).json({ notices: [], sourceUrl: '', note: '공지사항을 가져오는 중 오류가 발생했어요.' });
+    res.status(200).json({ paragraphs: [], sourceUrl: '', note: '예약정책을 가져오는 중 오류가 발생했어요.' });
   }
 };
