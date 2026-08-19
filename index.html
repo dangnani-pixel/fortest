@@ -45,6 +45,29 @@
     color:var(--muted);
     font-size:0.92rem;
   }
+
+  .authbar{
+    width:min(900px, 100% - 2*var(--gutter));
+    margin:0 auto 14px;
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:8px;
+    font-size:0.82rem;
+    color:var(--muted);
+  }
+  .authbar button{
+    padding:6px 14px;
+    font-size:0.82rem;
+    font-weight:600;
+  }
+  .authbar .ghost{
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--line);
+    padding:6px 12px;
+  }
+
   form{
     width:min(900px, 100% - 2*var(--gutter));
     margin:0 auto;
@@ -192,6 +215,51 @@
     color:var(--ink);
   }
 
+  .remind-toggle{
+    margin-top:8px;
+    width:100%;
+    background:#fff;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    padding:7px 0;
+    border-radius:7px;
+    font-size:0.8rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .remind-panel{
+    display:none;
+    margin-top:10px;
+    padding:10px;
+    background:#f7f8f4;
+    border:1px solid var(--line);
+    border-radius:10px;
+    flex-direction:column;
+    gap:8px;
+  }
+  .remind-panel.open{ display:flex; }
+  .remind-row{ display:flex; gap:6px; }
+  .remind-row > *{ flex:1; min-width:0; }
+  .remind-panel select, .remind-panel input{
+    padding:7px 8px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    font-size:0.82rem;
+    background:#fff;
+    width:100%;
+  }
+  .remind-submit{
+    padding:8px 0;
+    font-size:0.82rem;
+  }
+  .remind-msg{
+    font-size:0.76rem;
+    color:var(--muted);
+    min-height:1.1em;
+  }
+  .remind-msg.ok{ color:var(--green); }
+  .remind-msg.err{ color:var(--red); }
+
   .empty, .error{
     max-width:900px;
     margin:30px auto;
@@ -216,6 +284,8 @@
   <h1>🌲 자연휴양림 빈자리 조회</h1>
   <p>지역과 날짜를 고르면, 숲나들e 실시간 예약 현황을 모아서 보여드려요.</p>
 </header>
+
+<div class="authbar" id="authbar"></div>
 
 <form id="searchForm">
   <div class="field">
