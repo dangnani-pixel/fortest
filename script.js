@@ -130,6 +130,10 @@ function renderItems(items) {
 
           <button type="button" class="remind-toggle" data-target="${panelId}">🔔 예약 알림 등록</button>
           <div class="remind-panel" id="${panelId}" data-name="${escapeHtml(item.name)}" data-homepage="${escapeHtml(item.homepage || '')}">
+            <div class="notice-box">
+              <div class="notice-label">📋 이 휴양림 최근 공지</div>
+              <div class="notice-body notice-empty">불러오는 중…</div>
+            </div>
             <div class="remind-row">
               <select class="r-type">
                 <option value="weekly">매주 반복</option>
@@ -166,11 +170,62 @@ function renderItems(items) {
 
 // ---------- 알림 패널 동작 (이벤트 위임) ----------
 
+function renderNotices(panel, data) {
+  const body = panel.querySelector('.notice-body');
+  if (!data || (!data.notices?.length && !data.note)) {
+    body.className = 'notice-body notice-empty';
+    body.textContent = '공지사항을 가져오지 못했어요.';
+    return;
+  }
+  if (!data.notices.length) {
+    body.className = 'notice-body notice-empty';
+    body.textContent = data.note || '등록된 공지사항이 없어요.';
+    return;
+  }
+  body.className = 'notice-body';
+  body.innerHTML = data.notices
+    .map(
+      (n) => `
+      <div class="notice-item">
+        <a href="${escapeHtml(n.href)}" target="_blank" rel="noopener">${escapeHtml(n.title)}</a>
+        ${n.date ? `<span class="notice-date">${escapeHtml(n.date)}</span>` : ''}
+        ${n.preview ? `<div class="notice-preview">${escapeHtml(n.preview)}</div>` : ''}
+      </div>
+    `
+    )
+    .join('');
+}
+
+async function loadNoticesOnce(panel) {
+  if (panel.dataset.noticeLoaded) return;
+  panel.dataset.noticeLoaded = '1';
+
+  const homepage = panel.dataset.homepage;
+  const body = panel.querySelector('.notice-body');
+  if (!homepage) {
+    body.className = 'notice-body notice-empty';
+    body.textContent = '홈페이지 정보가 없어 공지사항을 확인할 수 없어요.';
+    return;
+  }
+
+  try {
+    const resp = await fetch(`/api/notice?homepage=${encodeURIComponent(homepage)}`);
+    const data = await resp.json();
+    renderNotices(panel, data);
+  } catch {
+    body.className = 'notice-body notice-empty';
+    body.textContent = '공지사항을 가져오는 중 오류가 발생했어요.';
+  }
+}
+
 grid.addEventListener('click', async (e) => {
   const toggleBtn = e.target.closest('.remind-toggle');
   if (toggleBtn) {
     const panel = document.getElementById(toggleBtn.dataset.target);
-    if (panel) panel.classList.toggle('open');
+    if (panel) {
+      panel.classList.toggle('open');
+      if (panel.classList.contains('open')) loadNoticesOnce(panel);
+    }
     return;
   }
 

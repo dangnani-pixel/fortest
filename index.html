@@ -238,6 +238,29 @@
     gap:8px;
   }
   .remind-panel.open{ display:flex; }
+  .notice-box{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    padding:8px 9px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+  }
+  .notice-box .notice-label{
+    font-size:0.72rem;
+    font-weight:700;
+    color:var(--muted);
+  }
+  .notice-item{
+    font-size:0.78rem;
+    line-height:1.4;
+  }
+  .notice-item a{ color:var(--ink); text-decoration:none; font-weight:600; }
+  .notice-item a:hover{ text-decoration:underline; }
+  .notice-item .notice-date{ color:var(--muted); font-size:0.72rem; margin-left:4px; }
+  .notice-item .notice-preview{ color:var(--muted); font-size:0.74rem; margin-top:2px; }
+  .notice-empty{ font-size:0.76rem; color:var(--muted); }
   .remind-row{ display:flex; gap:6px; }
   .remind-row > *{ flex:1; min-width:0; }
   .remind-panel select, .remind-panel input{
