@@ -8,33 +8,52 @@
 const { verify, getValidAccessToken } = require('./_lib/session');
 
 const DOW_KO = ['일', '월', '화', '수', '목', '금', '토'];
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+// Vercel 서버리스 함수는 UTC로 돈다. 사용자가 입력한 "오전 9시" 등은
+// 항상 한국시간(KST) 기준으로 해석해야 하므로, 서버 로컬 타임존에
+// 의존하지 않고 직접 KST <-> UTC epoch 변환을 한다.
+function seoulNow() {
+  const shifted = new Date(Date.now() + KST_OFFSET_MS);
+  return {
+    year: shifted.getUTCFullYear(),
+    month: shifted.getUTCMonth(), // 0-based
+    date: shifted.getUTCDate(),
+    day: shifted.getUTCDay(), // 0=일요일
+  };
+}
+
+// (year, month(0-based), date, hh, mm)을 "한국시간 기준"으로 보고 실제 UTC epoch(ms)로 변환.
+// Date.UTC가 범위를 벗어난 날짜(예: 32일)도 알아서 다음달로 정규화해준다.
+function seoulToEpoch(year, month, date, hh, mm) {
+  return Date.UTC(year, month, date, hh, mm, 0, 0) - KST_OFFSET_MS;
+}
 
 function nextOccurrence({ type, dayOfWeek, dayOfMonth, time, date }) {
   const [hh, mm] = String(time || '09:00').split(':').map(Number);
-  const now = new Date();
+  const nowEpoch = Date.now();
+  const now = seoulNow();
 
   if (type === 'once') {
     const [y, m, d] = String(date).split('-').map(Number);
-    return new Date(y, m - 1, d, hh, mm, 0, 0);
+    return new Date(seoulToEpoch(y, m - 1, d, hh, mm));
   }
 
   if (type === 'monthly') {
-    let d = new Date(now.getFullYear(), now.getMonth(), dayOfMonth, hh, mm, 0, 0);
-    if (d <= now) {
-      d = new Date(now.getFullYear(), now.getMonth() + 1, dayOfMonth, hh, mm, 0, 0);
+    let epoch = seoulToEpoch(now.year, now.month, Number(dayOfMonth), hh, mm);
+    if (epoch <= nowEpoch) {
+      epoch = seoulToEpoch(now.year, now.month + 1, Number(dayOfMonth), hh, mm);
     }
-    return d;
+    return new Date(epoch);
   }
 
   // weekly (기본값)
-  const d = new Date(now);
-  d.setHours(hh, mm, 0, 0);
-  const diff = (dayOfWeek - now.getDay() + 7) % 7;
-  d.setDate(now.getDate() + diff);
-  if (d <= now) {
-    d.setDate(d.getDate() + 7);
+  const diff = (Number(dayOfWeek) - now.day + 7) % 7;
+  let epoch = seoulToEpoch(now.year, now.month, now.date + diff, hh, mm);
+  if (epoch <= nowEpoch) {
+    epoch = seoulToEpoch(now.year, now.month, now.date + diff + 7, hh, mm);
   }
-  return d;
+  return new Date(epoch);
 }
 
 module.exports = async (req, res) => {
