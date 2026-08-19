@@ -136,28 +136,16 @@ function renderItems(items) {
             </div>
             <div class="remind-row">
               <select class="r-type">
-                <option value="weekly">매주 반복</option>
+                <option value="once">한 번만</option>
                 <option value="monthly">매월 반복</option>
-                <option value="once">특정 날짜 한 번만</option>
               </select>
               <input type="time" class="r-time" value="09:00" />
-            </div>
-            <div class="remind-row r-weekly">
-              <select class="r-dow">
-                <option value="0">일요일</option>
-                <option value="1">월요일</option>
-                <option value="2">화요일</option>
-                <option value="3" selected>수요일</option>
-                <option value="4">목요일</option>
-                <option value="5">금요일</option>
-                <option value="6">토요일</option>
-              </select>
             </div>
             <div class="remind-row r-monthly" style="display:none;">
               <input type="number" class="r-dom" min="1" max="31" placeholder="예: 1 (매월 1일)" />
             </div>
-            <div class="remind-row r-once" style="display:none;">
-              <input type="date" class="r-date" />
+            <div class="remind-row r-once">
+              <input type="date" class="r-date" min="${toYmd(new Date())}" />
             </div>
             <button type="button" class="remind-submit">이 시각으로 구글 캘린더에 등록</button>
             <div class="remind-msg"></div>
@@ -231,7 +219,6 @@ grid.addEventListener('click', async (e) => {
 
     const type = panel.querySelector('.r-type').value;
     const time = panel.querySelector('.r-time').value || '09:00';
-    const dayOfWeek = panel.querySelector('.r-dow').value;
     const dayOfMonth = panel.querySelector('.r-dom').value;
     const date = panel.querySelector('.r-date').value;
 
@@ -259,7 +246,6 @@ grid.addEventListener('click', async (e) => {
           homepage: panel.dataset.homepage,
           type,
           time,
-          dayOfWeek,
           dayOfMonth,
           date,
         }),
@@ -291,7 +277,6 @@ grid.addEventListener('change', (e) => {
   if (!e.target.classList.contains('r-type')) return;
   const panel = e.target.closest('.remind-panel');
   const type = e.target.value;
-  panel.querySelector('.r-weekly').style.display = type === 'weekly' ? 'flex' : 'none';
   panel.querySelector('.r-monthly').style.display = type === 'monthly' ? 'flex' : 'none';
   panel.querySelector('.r-once').style.display = type === 'once' ? 'flex' : 'none';
 });
