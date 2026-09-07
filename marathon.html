@@ -14,8 +14,6 @@
     --accent:#b3432b;
     --accent-bg:#faeae6;
     --accent-ink:#ffffff;
-    --amber:#9a6b12;
-    --amber-bg:#fbeed4;
     --green:#2f7d4f;
     --green-bg:#e6f4ea;
     --gutter:20px;
@@ -72,18 +70,6 @@
     font-family:inherit;
   }
   .field input:focus, .field select:focus{ outline:2px solid var(--accent); outline-offset:-1px; }
-
-  .notice{
-    width:min(900px, 100% - 2*var(--gutter));
-    margin:12px auto 0;
-    padding:10px 14px;
-    background:var(--amber-bg);
-    color:var(--amber);
-    border-left:3px solid var(--amber);
-    border-radius:8px;
-    font-size:0.82rem;
-    line-height:1.55;
-  }
 
   .status-line{
     max-width:900px;
@@ -150,6 +136,25 @@
   .host{ font-size:0.78rem; color:var(--muted); margin-top:2px; }
   .host b{ color:var(--ink); font-weight:600; }
 
+  .reg-period{ font-size:0.78rem; color:var(--ink); line-height:1.4; }
+  .reg-period b{ color:var(--muted); font-weight:700; margin-right:4px; }
+  .reg-period.muted{ color:var(--muted); }
+
+  .apply-btn{
+    margin-top:6px;
+    display:block;
+    text-align:center;
+    width:100%;
+    background:var(--accent);
+    color:var(--accent-ink);
+    text-decoration:none;
+    padding:9px 0;
+    border-radius:8px;
+    font-size:0.85rem;
+    font-weight:700;
+  }
+  .apply-btn:hover{ opacity:0.92; }
+
   .empty, .error{
     max-width:900px;
     margin:30px auto;
@@ -191,10 +196,6 @@
       <option value="name-asc">이름순</option>
     </select>
   </div>
-</div>
-
-<div class="notice">
-  이 페이지는 인증키를 브라우저에 노출하지 않기 위해 실시간 조회 대신 정적 데이터로 담아뒀어요(2026-09-07 기준, 지난 대회는 제외하고 예정 대회만 보여드려요). 공공데이터포털에는 아직 2026년 이후 대회가 등록되어 있지 않아, 마라톤 정보 사이트·대회 공식 홈페이지를 교차 확인해 2027년 3월분까지 추가했어요. 국내 마라톤은 보통 개최 6~9개월 전에 날짜가 확정되는 편이라, 2027년 4~5월 대회는 확인 시점 기준 아직 공식 발표된 게 없어 목록에 없습니다. 접수 일정은 주최 측 사정으로 바뀔 수 있으니, 참가 신청 전에는 꼭 대회 공식 홈페이지에서 최신 정보를 다시 확인해 주세요.
 </div>
 
 <div class="status-line" id="statusLine"></div>
