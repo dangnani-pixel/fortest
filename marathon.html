@@ -7,54 +7,203 @@
 <style>
   :root{
     --bg:#f6f4ee;
+    --card:#ffffff;
     --ink:#1f2a20;
     --muted:#6b7568;
     --line:#e3e0d5;
-    --accent:#2f7d4f;
+    --accent:#b3432b;
+    --accent-bg:#faeae6;
+    --accent-ink:#ffffff;
+    --amber:#9a6b12;
+    --amber-bg:#fbeed4;
+    --green:#2f7d4f;
+    --green-bg:#e6f4ea;
+    --gutter:20px;
   }
   *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
   body{
     margin:0;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
     font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
     background:var(--bg);
     color:var(--ink);
+    overflow-x:hidden;
+  }
+  .home-link{
+    display:block;
+    max-width:900px;
+    margin:14px auto 0;
+    padding:0 var(--gutter);
+    font-size:0.82rem;
+  }
+  .home-link a{ color:var(--muted); text-decoration:none; }
+  .home-link a:hover{ text-decoration:underline; }
+  header{
+    max-width:900px;
+    margin:0 auto;
+    padding:10px var(--gutter) 18px;
     text-align:center;
-    padding:24px;
   }
-  .icon{ font-size:3rem; margin-bottom:6px; }
-  h1{ margin:0 0 8px; font-size:1.4rem; }
-  p{ margin:0 0 22px; color:var(--muted); font-size:0.92rem; max-width:360px; line-height:1.6; }
-  a.home{
-    text-decoration:none;
-    color:#fff;
-    background:var(--accent);
-    padding:10px 22px;
+  header h1{ margin:0 0 6px; font-size:1.6rem; }
+  header p{ margin:0; color:var(--muted); font-size:0.92rem; }
+
+  .controls{
+    width:min(900px, 100% - 2*var(--gutter));
+    margin:0 auto;
+    padding:16px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:flex-end;
+  }
+  .field{ display:flex; flex-direction:column; gap:4px; flex:1 1 160px; min-width:0; }
+  .field.search-field{ flex:2 1 240px; }
+  .field label{ font-size:0.78rem; color:var(--muted); }
+  .field select, .field input{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid var(--line);
     border-radius:8px;
-    font-size:0.9rem;
-    font-weight:600;
+    font-size:0.92rem;
+    background:#fff;
+    font-family:inherit;
   }
+  .field input:focus, .field select:focus{ outline:2px solid var(--accent); outline-offset:-1px; }
+
+  .notice{
+    width:min(900px, 100% - 2*var(--gutter));
+    margin:12px auto 0;
+    padding:10px 14px;
+    background:var(--amber-bg);
+    color:var(--amber);
+    border-left:3px solid var(--amber);
+    border-radius:8px;
+    font-size:0.82rem;
+    line-height:1.55;
+  }
+
+  .status-line{
+    max-width:900px;
+    margin:14px auto 0;
+    padding:0 var(--gutter);
+    font-size:0.86rem;
+    color:var(--muted);
+    min-height:1.2em;
+  }
+
+  .grid{
+    max-width:900px;
+    margin:14px auto 60px;
+    padding:0 var(--gutter);
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px,1fr));
+    gap:14px;
+  }
+
+  @media (max-width:640px){
+    :root{ --gutter:16px; }
+    header{ padding-top:22px; }
+    header h1{ font-size:1.32rem; }
+    header p{ font-size:0.86rem; }
+    .controls{ flex-direction:column; align-items:stretch; }
+    .grid{ grid-template-columns:1fr; }
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .card .body{ padding:12px 14px 14px; display:flex; flex-direction:column; gap:6px; flex:1; }
+  .badge-row{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
   .badge{
     display:inline-block;
-    font-size:0.72rem;
-    font-weight:700;
-    color:#9a6b12;
-    background:#fbeed4;
+    padding:2px 8px;
     border-radius:999px;
-    padding:3px 10px;
-    margin-bottom:14px;
+    font-size:0.72rem;
+    font-weight:600;
   }
+  .badge.ended{ background:#eef0e9; color:var(--muted); }
+  .badge.today{ background:var(--green-bg); color:var(--green); }
+  .badge.upcoming{ background:var(--accent-bg); color:var(--accent); }
+
+  .name{ font-size:1.02rem; font-weight:700; margin:2px 0; }
+  .meta{ font-size:0.8rem; color:var(--muted); line-height:1.4; }
+  .dates{ font-size:0.86rem; font-weight:600; color:var(--ink); }
+
+  .dist-row{ display:flex; flex-wrap:wrap; gap:5px; margin-top:2px; }
+  .dist{
+    font-size:0.72rem;
+    font-weight:600;
+    background:#f0efe6;
+    color:var(--muted);
+    border:1px solid var(--line);
+    padding:2px 8px;
+    border-radius:6px;
+  }
+  .host{ font-size:0.78rem; color:var(--muted); margin-top:2px; }
+  .host b{ color:var(--ink); font-weight:600; }
+
+  .empty, .error{
+    max-width:900px;
+    margin:30px auto;
+    padding:0 var(--gutter);
+    text-align:center;
+    color:var(--muted);
+    font-size:0.9rem;
+  }
+  .error{ color:#b3432b; }
+
+  footer{ text-align:center; padding:20px; color:var(--muted); font-size:0.76rem; }
 </style>
 </head>
 <body>
-  <div class="badge">준비 중</div>
-  <div class="icon">🏃</div>
-  <h1>마라톤 대회</h1>
-  <p>전국 마라톤·러닝 대회 일정과 접수 정보를 모아 보여주는 페이지를 준비하고 있어요.<br>조금만 기다려 주세요!</p>
-  <a class="home" href="/">← 홈으로 돌아가기</a>
+
+<div class="home-link"><a href="/">← 홈으로</a></div>
+
+<header>
+  <h1>🏃 마라톤 대회</h1>
+  <p>공공데이터포털에 등록된 국내 마라톤 대회 정보를 검색하고, 종목별로 확인해보세요.</p>
+</header>
+
+<div class="controls">
+  <div class="field search-field">
+    <label for="searchInput">검색</label>
+    <input type="text" id="searchInput" placeholder="대회명·장소·주최기관 검색 (예: 서울, 하프, 동아일보)" autocomplete="off" />
+  </div>
+  <div class="field">
+    <label for="distance">종목</label>
+    <select id="distance">
+      <option value="all">전체</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="sort">정렬</label>
+    <select id="sort">
+      <option value="date-asc">날짜 빠른순</option>
+      <option value="date-desc">날짜 늦은순</option>
+      <option value="name-asc">이름순</option>
+    </select>
+  </div>
+</div>
+
+<div class="notice">
+  이 페이지는 인증키를 브라우저에 노출하지 않기 위해 실시간 조회 대신 정적 데이터로 담아뒀어요(2026-09-07 기준). 2025년까지는 공공데이터포털 등록 정보(18건)를, 그 이후 대회는 아직 공공데이터포털에 등록되어 있지 않아 마라톤 정보 사이트·대회 공식 홈페이지를 교차 확인해 2027년 3월분까지 추가했어요. 국내 마라톤은 보통 개최 6~9개월 전에 날짜가 확정되는 편이라, 2027년 4~5월 대회는 확인 시점 기준 아직 공식 발표된 게 없어 목록에 없습니다. 접수 일정은 주최 측 사정으로 바뀔 수 있으니, 참가 신청 전에는 꼭 대회 공식 홈페이지에서 최신 정보를 다시 확인해 주세요.
+</div>
+
+<div class="status-line" id="statusLine"></div>
+<div id="grid" class="grid"></div>
+
+<footer>
+  데이터 출처: 문화체육관광부_국내마라톤대회 정보(공공데이터포털, 2025년까지) · 2026년 9월 이후는 마라톤 정보 사이트·대회 공식 홈페이지 교차 확인 · 정적 스냅샷이라 실제 일정과 다를 수 있어요.
+</footer>
+
+<script src="marathon.js"></script>
 </body>
 </html>
