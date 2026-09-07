@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>마라톤 대회</title>
+<style>
+  :root{
+    --bg:#f6f4ee;
+    --ink:#1f2a20;
+    --muted:#6b7568;
+    --line:#e3e0d5;
+    --accent:#2f7d4f;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    text-align:center;
+    padding:24px;
+  }
+  .icon{ font-size:3rem; margin-bottom:6px; }
+  h1{ margin:0 0 8px; font-size:1.4rem; }
+  p{ margin:0 0 22px; color:var(--muted); font-size:0.92rem; max-width:360px; line-height:1.6; }
+  a.home{
+    text-decoration:none;
+    color:#fff;
+    background:var(--accent);
+    padding:10px 22px;
+    border-radius:8px;
+    font-size:0.9rem;
+    font-weight:600;
+  }
+  .badge{
+    display:inline-block;
+    font-size:0.72rem;
+    font-weight:700;
+    color:#9a6b12;
+    background:#fbeed4;
+    border-radius:999px;
+    padding:3px 10px;
+    margin-bottom:14px;
+  }
+</style>
+</head>
+<body>
+  <div class="badge">준비 중</div>
+  <div class="icon">🏃</div>
+  <h1>마라톤 대회</h1>
+  <p>전국 마라톤·러닝 대회 일정과 접수 정보를 모아 보여주는 페이지를 준비하고 있어요.<br>조금만 기다려 주세요!</p>
+  <a class="home" href="/">← 홈으로 돌아가기</a>
+</body>
+</html>
