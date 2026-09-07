@@ -52,6 +52,16 @@ function pad2(n) {
   return String(n).padStart(2, '0');
 }
 
+// 시작일~종료일이 이 일수 이상이면 "연중 상시 개최" 축제로 보고 목록에서 제외한다.
+const YEAR_ROUND_DAYS_THRESHOLD = 300;
+
+function daySpan(startYmdStr, endYmdStr) {
+  if (!startYmdStr || !endYmdStr || startYmdStr.length !== 8 || endYmdStr.length !== 8) return 0;
+  const s = Date.UTC(Number(startYmdStr.slice(0, 4)), Number(startYmdStr.slice(4, 6)) - 1, Number(startYmdStr.slice(6, 8)));
+  const e = Date.UTC(Number(endYmdStr.slice(0, 4)), Number(endYmdStr.slice(4, 6)) - 1, Number(endYmdStr.slice(6, 8)));
+  return Math.round((e - s) / 86400000);
+}
+
 // rangeStart~rangeEnd(Date, UTC) 사이에 걸치는 달 목록을 "YYYYMM" 옵션으로 만든다.
 function buildMonthOptions(rangeStart, rangeEnd) {
   const months = [];
@@ -141,7 +151,12 @@ module.exports = async (req, res) => {
     const rawItems = data.response.body?.items?.item || [];
     const nowYmdNum = Number(ymd(rangeStart)); // 진행중/예정 판정은 항상 "오늘" 기준
 
-    const items = rawItems.map((it) => {
+    // 1년 내내 열리는(상설) 축제는 제외
+    const filteredRawItems = rawItems.filter(
+      (it) => daySpan(it.eventstartdate, it.eventenddate) < YEAR_ROUND_DAYS_THRESHOLD
+    );
+
+    const items = filteredRawItems.map((it) => {
       const s = Number(it.eventstartdate);
       const e = Number(it.eventenddate);
       const status = s > nowYmdNum ? '예정' : e >= nowYmdNum ? '진행중' : '종료';
