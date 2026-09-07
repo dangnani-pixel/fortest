@@ -7,6 +7,7 @@ const RACE_DATA = [
   // 교차 확인해 수동으로 추가했다(확인 시점: 2026-09-07). 접수 마감·일정은 주최 측 사정으로
   // 바뀔 수 있으니, 참가 신청 전에는 반드시 대회 공식 홈페이지에서 최신 정보를 다시 확인할 것.
   { title: '제19회 가평자라섬 전국마라톤', date: '2026-09-20', place: '가평종합운동장(경기 가평)', distances: '5km, 10km, Half', host: '가평군체육회·세계일보', regPeriod: '2026.04.14 ~ 05.30', url: 'https://gprun.com/' },
+  { title: '2026 Run Your Way 서울 10K (뉴발란스)', date: '2026-10-04', place: '서울 여의도공원 일대(한강 순환 10km 코스)', distances: '10km', host: '이랜드 뉴발란스(New Balance Korea)', regPeriod: '2026.07.31 ~ 08.02 (기본 패키지 래플, 마감) · 이후 오프라인 패키지 순차 판매', url: 'https://www.nbkorea.com/collection/RUNYOURWAY.action' },
   { title: '2026 춘천마라톤 (전국마라톤선수권대회 겸 조선일보 춘천마라톤대회)', date: '2026-10-25', place: '춘천 공지천(의암호 순환코스)', distances: '10km, Full', host: '조선일보·스포츠조선·대한육상연맹', regPeriod: '2026.06.16 ~ 07.23', url: 'https://www.chuncheonmarathon.com/' },
   { title: '제21회 사천노을마라톤대회', date: '2026-10-31', place: '경남 사천 선진거북선공원', distances: '5km, 10km, Half', host: '경남일보', regPeriod: '선착순 마감 (정확한 접수 시작일 미확인)', url: 'https://www.sunset.or.kr/' },
   { title: '2026 오티즘 레이스', date: '2026-10-31', place: '서울 월드컵공원 평화의 광장', distances: '4.2km, 10km, Half', host: '한국자폐인사랑협회·서울특별시', regPeriod: '2026.07.08 ~ 09.30', url: 'https://autismrace.com/' },
@@ -23,8 +24,6 @@ const RACE_DATA = [
   { title: '2027 서울마라톤 (제97회 동아마라톤)', date: '2027-03-21', place: '광화문광장(집결)~잠실종합운동장', distances: '10km, Full', host: '동아일보사·대한육상연맹', regPeriod: '', url: 'https://seoul-marathon.com/' },
 ];
 
-const searchInput = document.getElementById('searchInput');
-const distanceSelect = document.getElementById('distance');
 const sortSelect = document.getElementById('sort');
 const statusLine = document.getElementById('statusLine');
 const grid = document.getElementById('grid');
@@ -45,33 +44,11 @@ function parseDistances(str) {
   return str.split(',').map((s) => s.trim()).filter(Boolean);
 }
 
-function normalizeDistanceLabel(d) {
-  const low = d.toLowerCase();
-  if (low.includes('full')) return 'Full';
-  if (low.includes('half')) return 'Half';
-  return d;
-}
-
 function daysUntil(dateStr) {
   const target = new Date(`${dateStr}T00:00:00`);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return Math.round((target - today) / 86400000);
-}
-
-// ---------- 종목 옵션 채우기 ----------
-function fillDistanceOptions() {
-  const set = new Set();
-  RACE_DATA.forEach((item) => parseDistances(item.distances).forEach((d) => set.add(normalizeDistanceLabel(d))));
-  const order = ['5km', '10km', 'Half', 'Full'];
-  const known = order.filter((o) => set.has(o));
-  const rest = [...set].filter((x) => !order.includes(x)).sort();
-  [...known, ...rest].forEach((label) => {
-    const opt = document.createElement('option');
-    opt.value = label;
-    opt.textContent = label;
-    distanceSelect.appendChild(opt);
-  });
 }
 
 // ---------- 결과 렌더링 ----------
@@ -117,32 +94,20 @@ function renderItems(items) {
   }).join('');
 }
 
-// ---------- 검색/필터/정렬 ----------
-function applyFilters() {
-  const term = searchInput.value.trim().toLowerCase();
-  const distance = distanceSelect.value;
+// ---------- 정렬 ----------
+function applySort() {
   const sort = sortSelect.value;
 
-  let rows = RACE_DATA.filter((item) => {
-    const matchesDistance = distance === 'all' || parseDistances(item.distances).some((d) => normalizeDistanceLabel(d) === distance);
-    const haystack = `${item.title} ${item.place} ${item.host}`.toLowerCase();
-    const matchesSearch = !term || haystack.includes(term);
-    return matchesDistance && matchesSearch;
-  });
-
-  rows.sort((a, b) => {
+  const rows = [...RACE_DATA].sort((a, b) => {
     if (sort === 'name-asc') return a.title.localeCompare(b.title, 'ko');
     const diff = new Date(a.date) - new Date(b.date);
     return sort === 'date-desc' ? -diff : diff;
   });
 
-  statusLine.textContent = `${rows.length}개 대회 표시 중 (전체 ${RACE_DATA.length}개)`;
+  statusLine.textContent = `총 ${rows.length}개 대회`;
   renderItems(rows);
 }
 
-searchInput.addEventListener('input', applyFilters);
-distanceSelect.addEventListener('change', applyFilters);
-sortSelect.addEventListener('change', applyFilters);
+sortSelect.addEventListener('change', applySort);
 
-fillDistanceOptions();
-applyFilters();
+applySort();

@@ -56,9 +56,9 @@
     flex-wrap:wrap;
     gap:12px;
     align-items:flex-end;
+    justify-content:flex-end;
   }
-  .field{ display:flex; flex-direction:column; gap:4px; flex:1 1 160px; min-width:0; }
-  .field.search-field{ flex:2 1 240px; }
+  .field{ display:flex; flex-direction:column; gap:4px; flex:0 1 200px; min-width:0; }
   .field label{ font-size:0.78rem; color:var(--muted); }
   .field select, .field input{
     width:100%;
@@ -174,20 +174,10 @@
 
 <header>
   <h1>🏃 마라톤 대회</h1>
-  <p>공공데이터포털에 등록된 국내 마라톤 대회 정보를 검색하고, 종목별로 확인해보세요.</p>
+  <p>예정된 국내 마라톤 대회 정보를 날짜순·이름순으로 확인해보세요.</p>
 </header>
 
 <div class="controls">
-  <div class="field search-field">
-    <label for="searchInput">검색</label>
-    <input type="text" id="searchInput" placeholder="대회명·장소·주최기관 검색 (예: 서울, 하프, 동아일보)" autocomplete="off" />
-  </div>
-  <div class="field">
-    <label for="distance">종목</label>
-    <select id="distance">
-      <option value="all">전체</option>
-    </select>
-  </div>
   <div class="field">
     <label for="sort">정렬</label>
     <select id="sort">
