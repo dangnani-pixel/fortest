@@ -23,8 +23,6 @@ const RACE_DATA = [
   { title: '2027 서울마라톤 (제97회 동아마라톤)', date: '2027-03-21', place: '광화문광장(집결)~잠실종합운동장', distances: '10km, Full', host: '동아일보사·대한육상연맹', regPeriod: '', url: 'https://seoul-marathon.com/' },
 ];
 
-const searchInput = document.getElementById('searchInput');
-const distanceSelect = document.getElementById('distance');
 const sortSelect = document.getElementById('sort');
 const statusLine = document.getElementById('statusLine');
 const grid = document.getElementById('grid');
@@ -45,33 +43,11 @@ function parseDistances(str) {
   return str.split(',').map((s) => s.trim()).filter(Boolean);
 }
 
-function normalizeDistanceLabel(d) {
-  const low = d.toLowerCase();
-  if (low.includes('full')) return 'Full';
-  if (low.includes('half')) return 'Half';
-  return d;
-}
-
 function daysUntil(dateStr) {
   const target = new Date(`${dateStr}T00:00:00`);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return Math.round((target - today) / 86400000);
-}
-
-// ---------- 종목 옵션 채우기 ----------
-function fillDistanceOptions() {
-  const set = new Set();
-  RACE_DATA.forEach((item) => parseDistances(item.distances).forEach((d) => set.add(normalizeDistanceLabel(d))));
-  const order = ['5km', '10km', 'Half', 'Full'];
-  const known = order.filter((o) => set.has(o));
-  const rest = [...set].filter((x) => !order.includes(x)).sort();
-  [...known, ...rest].forEach((label) => {
-    const opt = document.createElement('option');
-    opt.value = label;
-    opt.textContent = label;
-    distanceSelect.appendChild(opt);
-  });
 }
 
 // ---------- 결과 렌더링 ----------
@@ -117,32 +93,20 @@ function renderItems(items) {
   }).join('');
 }
 
-// ---------- 검색/필터/정렬 ----------
-function applyFilters() {
-  const term = searchInput.value.trim().toLowerCase();
-  const distance = distanceSelect.value;
+// ---------- 정렬 ----------
+function applySort() {
   const sort = sortSelect.value;
 
-  let rows = RACE_DATA.filter((item) => {
-    const matchesDistance = distance === 'all' || parseDistances(item.distances).some((d) => normalizeDistanceLabel(d) === distance);
-    const haystack = `${item.title} ${item.place} ${item.host}`.toLowerCase();
-    const matchesSearch = !term || haystack.includes(term);
-    return matchesDistance && matchesSearch;
-  });
-
-  rows.sort((a, b) => {
+  const rows = [...RACE_DATA].sort((a, b) => {
     if (sort === 'name-asc') return a.title.localeCompare(b.title, 'ko');
     const diff = new Date(a.date) - new Date(b.date);
     return sort === 'date-desc' ? -diff : diff;
   });
 
-  statusLine.textContent = `${rows.length}개 대회 표시 중 (전체 ${RACE_DATA.length}개)`;
+  statusLine.textContent = `총 ${rows.length}개 대회`;
   renderItems(rows);
 }
 
-searchInput.addEventListener('input', applyFilters);
-distanceSelect.addEventListener('change', applyFilters);
-sortSelect.addEventListener('change', applyFilters);
+sortSelect.addEventListener('change', applySort);
 
-fillDistanceOptions();
-applyFilters();
+applySort();
