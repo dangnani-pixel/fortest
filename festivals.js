@@ -3,6 +3,7 @@ const submitBtn = document.getElementById('submitBtn');
 const statusLine = document.getElementById('statusLine');
 const grid = document.getElementById('grid');
 const regionSelect = document.getElementById('region');
+const monthSelect = document.getElementById('month');
 
 function escapeHtml(s) {
   return String(s || '').replace(/[&<>"']/g, (c) => ({
@@ -25,6 +26,19 @@ function fillRegions(regions) {
     opt.value = code;
     opt.textContent = name;
     regionSelect.appendChild(opt);
+  });
+}
+
+// ---------- 월 옵션 채우기 (첫 조회 응답에 담겨온 월 목록 사용) ----------
+let monthsLoaded = false;
+function fillMonths(months) {
+  if (monthsLoaded) return;
+  monthsLoaded = true;
+  months.forEach(({ value, label }) => {
+    const opt = document.createElement('option');
+    opt.value = value;
+    opt.textContent = label;
+    monthSelect.appendChild(opt);
   });
 }
 
@@ -127,6 +141,7 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const region = regionSelect.value;
+  const month = monthSelect.value;
 
   submitBtn.disabled = true;
   submitBtn.textContent = '조회 중…';
@@ -134,7 +149,7 @@ form.addEventListener('submit', async (e) => {
   grid.innerHTML = '';
 
   try {
-    const resp = await fetch(`/api/festivals?region=${encodeURIComponent(region)}`);
+    const resp = await fetch(`/api/festivals?region=${encodeURIComponent(region)}&month=${encodeURIComponent(month)}`);
     const data = await resp.json();
 
     if (!resp.ok) {
@@ -142,6 +157,7 @@ form.addEventListener('submit', async (e) => {
     }
 
     fillRegions(data.regions);
+    fillMonths(data.months);
     statusLine.textContent = `${formatDate(data.start)} ~ ${formatDate(data.end)} · 총 ${data.count}건`;
     renderItems(data.items);
   } catch (err) {
