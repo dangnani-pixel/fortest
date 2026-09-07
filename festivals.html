@@ -7,54 +7,211 @@
 <style>
   :root{
     --bg:#f6f4ee;
+    --card:#ffffff;
     --ink:#1f2a20;
     --muted:#6b7568;
     --line:#e3e0d5;
-    --accent:#2f7d4f;
+    --accent:#b3432b;
+    --accent-bg:#faeae6;
+    --accent-ink:#ffffff;
+    --amber:#9a6b12;
+    --amber-bg:#fbeed4;
+    --green:#2f7d4f;
+    --green-bg:#e6f4ea;
+    --gutter:20px;
   }
   *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
   body{
     margin:0;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
     font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
     background:var(--bg);
     color:var(--ink);
+    overflow-x:hidden;
+  }
+  .home-link{
+    display:block;
+    max-width:900px;
+    margin:14px auto 0;
+    padding:0 var(--gutter);
+    font-size:0.82rem;
+  }
+  .home-link a{ color:var(--muted); text-decoration:none; }
+  .home-link a:hover{ text-decoration:underline; }
+  header{
+    max-width:900px;
+    margin:0 auto;
+    padding:10px var(--gutter) 18px;
     text-align:center;
-    padding:24px;
   }
-  .icon{ font-size:3rem; margin-bottom:6px; }
-  h1{ margin:0 0 8px; font-size:1.4rem; }
-  p{ margin:0 0 22px; color:var(--muted); font-size:0.92rem; max-width:360px; line-height:1.6; }
-  a.home{
-    text-decoration:none;
-    color:#fff;
-    background:var(--accent);
-    padding:10px 22px;
+  header h1{ margin:0 0 6px; font-size:1.6rem; }
+  header p{ margin:0; color:var(--muted); font-size:0.92rem; }
+
+  form{
+    width:min(900px, 100% - 2*var(--gutter));
+    margin:0 auto;
+    padding:16px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:flex-end;
+  }
+  .field{ display:flex; flex-direction:column; gap:4px; flex:1 1 160px; min-width:0; }
+  .field label{ font-size:0.78rem; color:var(--muted); }
+  .field select{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid var(--line);
     border-radius:8px;
-    font-size:0.9rem;
-    font-weight:600;
+    font-size:0.92rem;
+    background:#fff;
   }
+  button{
+    padding:10px 22px;
+    border:none;
+    border-radius:8px;
+    background:var(--accent);
+    color:var(--accent-ink);
+    font-size:0.95rem;
+    font-weight:600;
+    cursor:pointer;
+    flex:0 0 auto;
+  }
+  button:disabled{ opacity:0.6; cursor:progress; }
+
+  .status-line{
+    max-width:900px;
+    margin:14px auto 0;
+    padding:0 var(--gutter);
+    font-size:0.86rem;
+    color:var(--muted);
+    min-height:1.2em;
+  }
+
+  .grid{
+    max-width:900px;
+    margin:14px auto 60px;
+    padding:0 var(--gutter);
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px,1fr));
+    gap:14px;
+  }
+
+  @media (max-width:640px){
+    :root{ --gutter:16px; }
+    header{ padding-top:22px; }
+    header h1{ font-size:1.32rem; }
+    header p{ font-size:0.86rem; }
+    form{ flex-direction:column; align-items:stretch; }
+    button{ width:100%; padding:13px; font-size:1rem; }
+    .grid{ grid-template-columns:1fr; }
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .card .thumb{ width:100%; height:130px; object-fit:cover; background:#eee; }
+  .card .body{ padding:12px 14px 14px; display:flex; flex-direction:column; gap:6px; flex:1; }
+  .badge-row{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
   .badge{
     display:inline-block;
-    font-size:0.72rem;
-    font-weight:700;
-    color:#9a6b12;
-    background:#fbeed4;
+    padding:2px 8px;
     border-radius:999px;
-    padding:3px 10px;
-    margin-bottom:14px;
+    font-size:0.72rem;
+    font-weight:600;
   }
+  .badge.region{ background:#eef0e9; color:var(--muted); }
+  .badge.ongoing{ background:var(--green-bg); color:var(--green); }
+  .badge.upcoming{ background:var(--accent-bg); color:var(--accent); }
+
+  .name{ font-size:1.02rem; font-weight:700; margin:2px 0; }
+  .meta{ font-size:0.8rem; color:var(--muted); line-height:1.4; }
+  .dates{ font-size:0.86rem; font-weight:600; color:var(--ink); }
+
+  .detail-toggle{
+    margin-top:8px;
+    width:100%;
+    background:#fff;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    padding:7px 0;
+    border-radius:7px;
+    font-size:0.8rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .detail-panel{
+    display:none;
+    margin-top:10px;
+    padding:10px;
+    background:#f7f8f4;
+    border:1px solid var(--line);
+    border-radius:10px;
+    flex-direction:column;
+    gap:8px;
+    font-size:0.82rem;
+    line-height:1.5;
+  }
+  .detail-panel.open{ display:flex; }
+  .detail-row b{ display:block; font-size:0.72rem; color:var(--muted); font-weight:700; margin-bottom:2px; }
+  .booking-box{
+    background:var(--amber-bg);
+    color:var(--amber);
+    border-radius:8px;
+    padding:8px 9px;
+    font-weight:600;
+  }
+  .booking-box b{ color:var(--amber); }
+  .detail-panel a{ color:var(--accent); }
+  .detail-empty{ font-size:0.78rem; color:var(--muted); }
+
+  .empty, .error{
+    max-width:900px;
+    margin:30px auto;
+    padding:0 var(--gutter);
+    text-align:center;
+    color:var(--muted);
+    font-size:0.9rem;
+  }
+  .error{ color:#b3432b; }
+
+  footer{ text-align:center; padding:20px; color:var(--muted); font-size:0.76rem; }
 </style>
 </head>
 <body>
-  <div class="badge">준비 중</div>
-  <div class="icon">🎪</div>
-  <h1>전국 축제 일정</h1>
-  <p>지역별 축제·행사 일정을 모아 보여주는 페이지를 준비하고 있어요.<br>조금만 기다려 주세요!</p>
-  <a class="home" href="/">← 홈으로 돌아가기</a>
+
+<div class="home-link"><a href="/">← 홈으로</a></div>
+
+<header>
+  <h1>🎪 전국 축제 일정</h1>
+  <p>오늘부터 6개월 안에 열리는 축제를 지역별로 모아서 보여드려요.</p>
+</header>
+
+<form id="searchForm">
+  <div class="field">
+    <label for="region">지역</label>
+    <select id="region" name="region">
+      <option value="all">전국 전체</option>
+    </select>
+  </div>
+  <button type="submit" id="submitBtn">축제 조회</button>
+</form>
+
+<div class="status-line" id="statusLine"></div>
+<div id="grid" class="grid"></div>
+
+<footer>
+  데이터 출처: 한국관광공사 TourAPI(공공데이터포털) · 실제 일정은 주최 측 사정에 따라 바뀔 수 있어요.
+</footer>
+
+<script src="festivals.js"></script>
 </body>
 </html>
