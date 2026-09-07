@@ -35,6 +35,13 @@ const RACE_DATA = [
   { title: '26서울동행마라톤대회', date: '2026-11-01', place: '서울 목동종합운동장 주경기장', distances: '5km, 10km, Half', host: '서울동행마라톤조직위원회' },
   { title: '제2회 대전 신채호 마라톤대회', date: '2026-11-01', place: '대전 뿌리공원 잔디광장', distances: '5km, 10km, Half', host: '대전시 중구 육상연맹' },
   { title: '2026 김천전국마라톤대회', date: '2026-11-01', place: '경북 김천종합스포츠타운', distances: '5km, 10km, Half', host: '김천시체육회·매일신문' },
+
+  // 2026년 12월 ~ 2027년 5월: 위와 같은 방식으로 교차 확인했지만, 2027년 4~5월 대회는
+  // 확인 시점(2026-09-07) 기준 대부분 아직 날짜가 공식 발표되지 않아 목록에 넣지 못했다.
+  // (국내 마라톤은 통상 개최 6~9개월 전에 날짜가 확정된다.) 아래는 확정 발표된 대회만 추가.
+  { title: '2027 대구마라톤', date: '2027-02-28', place: '대구스타디움', distances: '5km, 10km, Half, Full', host: '대구광역시·대한육상연맹' },
+  { title: '2027 제주국제관광마라톤축제', date: '2027-03-20', place: '제주 구좌종합경기장 일대(김녕해변 인근)', distances: '10km, Half, Full', host: '제주특별자치도' },
+  { title: '2027 서울마라톤 (제97회 동아마라톤)', date: '2027-03-21', place: '광화문광장(집결)~잠실종합운동장', distances: '10km, Full', host: '동아일보사·대한육상연맹' },
 ];
 
 const searchInput = document.getElementById('searchInput');
