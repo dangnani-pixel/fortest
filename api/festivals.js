@@ -48,6 +48,28 @@ function toDate(ymdStr) {
   return `${ymdStr.slice(0, 4)}-${ymdStr.slice(4, 6)}-${ymdStr.slice(6, 8)}`;
 }
 
+function pad2(n) {
+  return String(n).padStart(2, '0');
+}
+
+// rangeStart~rangeEnd(Date, UTC) 사이에 걸치는 달 목록을 "YYYYMM" 옵션으로 만든다.
+function buildMonthOptions(rangeStart, rangeEnd) {
+  const months = [];
+  let y = rangeStart.getUTCFullYear();
+  let m = rangeStart.getUTCMonth(); // 0-based
+  const endY = rangeEnd.getUTCFullYear();
+  const endM = rangeEnd.getUTCMonth();
+  while (y < endY || (y === endY && m <= endM)) {
+    months.push({ value: `${y}${pad2(m + 1)}`, label: `${y}년 ${m + 1}월` });
+    m += 1;
+    if (m > 11) {
+      m = 0;
+      y += 1;
+    }
+  }
+  return months;
+}
+
 module.exports = async (req, res) => {
   try {
     const key = process.env.TOUR_API_KEY;
@@ -56,15 +78,43 @@ module.exports = async (req, res) => {
       return;
     }
 
-    const { region = 'all' } = req.query;
+    const { region = 'all', month = 'all' } = req.query;
     if (region !== 'all' && !REGIONS[region]) {
       res.status(400).json({ error: `알 수 없는 지역 코드: ${region}` });
       return;
     }
 
     const now = kstNow();
-    const start = ymd(now);
-    const end = ymd(addMonthsUtc(now, 6));
+    const rangeStart = now;
+    const rangeEnd = addMonthsUtc(now, 6);
+    const monthOptions = buildMonthOptions(rangeStart, rangeEnd);
+
+    let start;
+    let end;
+
+    if (month !== 'all') {
+      if (!/^\d{6}$/.test(month)) {
+        res.status(400).json({ error: `알 수 없는 월 값: ${month}` });
+        return;
+      }
+      const y = Number(month.slice(0, 4));
+      const m = Number(month.slice(4, 6));
+      const monthStart = new Date(Date.UTC(y, m - 1, 1));
+      const monthEnd = new Date(Date.UTC(y, m, 0)); // 해당 월의 마지막 날
+      const clampedStart = monthStart < rangeStart ? rangeStart : monthStart;
+      const clampedEnd = monthEnd > rangeEnd ? rangeEnd : monthEnd;
+
+      if (clampedStart > clampedEnd) {
+        res.status(400).json({ error: '선택한 달은 조회 가능한 기간(오늘부터 6개월)을 벗어났어요.' });
+        return;
+      }
+
+      start = ymd(clampedStart);
+      end = ymd(clampedEnd);
+    } else {
+      start = ymd(rangeStart);
+      end = ymd(rangeEnd);
+    }
 
     const params = new URLSearchParams({
       serviceKey: key,
@@ -89,7 +139,7 @@ module.exports = async (req, res) => {
     }
 
     const rawItems = data.response.body?.items?.item || [];
-    const nowYmdNum = Number(start);
+    const nowYmdNum = Number(ymd(rangeStart)); // 진행중/예정 판정은 항상 "오늘" 기준
 
     const items = rawItems.map((it) => {
       const s = Number(it.eventstartdate);
@@ -123,6 +173,8 @@ module.exports = async (req, res) => {
       end: toDate(end),
       region,
       regions: REGIONS,
+      month,
+      months: monthOptions,
       count: items.length,
       items,
     });
