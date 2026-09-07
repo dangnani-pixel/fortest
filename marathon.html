@@ -45,32 +45,6 @@
   header h1{ margin:0 0 6px; font-size:1.6rem; }
   header p{ margin:0; color:var(--muted); font-size:0.92rem; }
 
-  .controls{
-    width:min(900px, 100% - 2*var(--gutter));
-    margin:0 auto;
-    padding:16px;
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:14px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    align-items:flex-end;
-    justify-content:flex-end;
-  }
-  .field{ display:flex; flex-direction:column; gap:4px; flex:0 1 200px; min-width:0; }
-  .field label{ font-size:0.78rem; color:var(--muted); }
-  .field select, .field input{
-    width:100%;
-    padding:9px 10px;
-    border:1px solid var(--line);
-    border-radius:8px;
-    font-size:0.92rem;
-    background:#fff;
-    font-family:inherit;
-  }
-  .field input:focus, .field select:focus{ outline:2px solid var(--accent); outline-offset:-1px; }
-
   .status-line{
     max-width:900px;
     margin:14px auto 0;
@@ -94,7 +68,6 @@
     header{ padding-top:22px; }
     header h1{ font-size:1.32rem; }
     header p{ font-size:0.86rem; }
-    .controls{ flex-direction:column; align-items:stretch; }
     .grid{ grid-template-columns:1fr; }
   }
 
@@ -174,19 +147,8 @@
 
 <header>
   <h1>🏃 마라톤 대회</h1>
-  <p>예정된 국내 마라톤 대회 정보를 날짜순·이름순으로 확인해보세요.</p>
+  <p>예정된 국내 마라톤 대회 정보를 날짜순으로 확인해보세요.</p>
 </header>
-
-<div class="controls">
-  <div class="field">
-    <label for="sort">정렬</label>
-    <select id="sort">
-      <option value="date-asc">날짜 빠른순</option>
-      <option value="date-desc">날짜 늦은순</option>
-      <option value="name-asc">이름순</option>
-    </select>
-  </div>
-</div>
 
 <div class="status-line" id="statusLine"></div>
 <div id="grid" class="grid"></div>

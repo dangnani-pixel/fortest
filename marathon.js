@@ -24,7 +24,6 @@ const RACE_DATA = [
   { title: '2027 서울마라톤 (제97회 동아마라톤)', date: '2027-03-21', place: '광화문광장(집결)~잠실종합운동장', distances: '10km, Full', host: '동아일보사·대한육상연맹', regPeriod: '', url: 'https://seoul-marathon.com/' },
 ];
 
-const sortSelect = document.getElementById('sort');
 const statusLine = document.getElementById('statusLine');
 const grid = document.getElementById('grid');
 
@@ -94,20 +93,7 @@ function renderItems(items) {
   }).join('');
 }
 
-// ---------- 정렬 ----------
-function applySort() {
-  const sort = sortSelect.value;
-
-  const rows = [...RACE_DATA].sort((a, b) => {
-    if (sort === 'name-asc') return a.title.localeCompare(b.title, 'ko');
-    const diff = new Date(a.date) - new Date(b.date);
-    return sort === 'date-desc' ? -diff : diff;
-  });
-
-  statusLine.textContent = `총 ${rows.length}개 대회`;
-  renderItems(rows);
-}
-
-sortSelect.addEventListener('change', applySort);
-
-applySort();
+// 날짜 빠른순으로 고정 정렬해 렌더링
+const rows = [...RACE_DATA].sort((a, b) => new Date(a.date) - new Date(b.date));
+statusLine.textContent = `총 ${rows.length}개 대회`;
+renderItems(rows);
