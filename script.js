@@ -42,6 +42,14 @@ function escapeHtml(s) {
   }[c]));
 }
 
+function renderSkeletons() {
+  grid.innerHTML = Array.from({ length: 6 }, () => `
+    <div class="card skeleton-card" aria-hidden="true">
+      <div class="skeleton-lines"><span></span><span></span><span></span></div>
+    </div>
+  `).join('');
+}
+
 // ---------- 구글 로그인 상태 ----------
 
 let authState = { loggedIn: false, email: null };
@@ -305,7 +313,7 @@ form.addEventListener('submit', async (e) => {
   statusLine.textContent = region === 'all'
     ? '전국 9개 권역을 순서대로 조회하고 있어요. 잠시만 기다려 주세요…'
     : '조회 중…';
-  grid.innerHTML = '';
+  renderSkeletons();
 
   try {
     const url = `/api/search?region=${encodeURIComponent(region)}&start=${start}&end=${end}&people=${encodeURIComponent(people)}`;

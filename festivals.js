@@ -16,6 +16,14 @@ function formatDate(d) {
   return d.replaceAll('-', '.');
 }
 
+function renderSkeletons() {
+  grid.innerHTML = Array.from({ length: 6 }, () => `
+    <div class="card skeleton-card" aria-hidden="true">
+      <div class="skeleton-lines"><span></span><span></span><span></span></div>
+    </div>
+  `).join('');
+}
+
 // ---------- 지역 옵션 채우기 (첫 조회 응답에 담겨온 지역 목록 사용) ----------
 let regionsLoaded = false;
 function fillRegions(regions) {
@@ -146,7 +154,7 @@ form.addEventListener('submit', async (e) => {
   submitBtn.disabled = true;
   submitBtn.textContent = '조회 중…';
   statusLine.textContent = '조회 중…';
-  grid.innerHTML = '';
+  renderSkeletons();
 
   try {
     const resp = await fetch(`/api/festivals?region=${encodeURIComponent(region)}&month=${encodeURIComponent(month)}`);
