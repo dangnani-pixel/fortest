@@ -477,3 +477,171 @@ select:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* Playful mascot edition */
+.home-page {
+  --cute-pink: #f4c7cb;
+  --cute-yellow: #f5d99a;
+  --cute-mint: #bee0c4;
+  --cute-blue: #c7d9ee;
+}
+
+.home-page .hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 22%, rgba(255,255,255,.8) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 18%, rgba(255,255,255,.65) 0 2px, transparent 3px),
+    radial-gradient(circle at 90% 35%, rgba(255,231,179,.75) 0 3px, transparent 4px);
+}
+
+.hero-friend {
+  position: relative;
+  width: 82px;
+  height: 72px;
+  margin: 0 auto 9px;
+  animation: mascot-float 3.4s ease-in-out infinite;
+}
+
+.hero-friend svg {
+  width: 70px;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,.22));
+}
+
+.hero-friend span {
+  position: absolute;
+  left: 65px;
+  top: 3px;
+  width: max-content;
+  padding: 6px 9px;
+  border-radius: 13px 13px 13px 3px;
+  background: #fffaf0;
+  color: #74503f;
+  font-size: .65rem;
+  font-weight: 800;
+  box-shadow: 0 5px 15px rgba(0,0,0,.12);
+}
+
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-7px) rotate(1deg); }
+}
+
+.home-page .hero-content { padding-bottom: 83px; }
+
+.home-page .kicker {
+  margin-bottom: 13px;
+  padding: 6px 13px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(8px);
+}
+
+.home-page .kicker::before,
+.home-page .kicker::after { display: none; }
+
+.home-page .hero h1 { letter-spacing: -.045em; }
+
+.home-page .cat-card {
+  border-width: 2px;
+  border-color: rgba(255,255,255,.8);
+  border-radius: 29px 29px 29px 11px;
+}
+
+.home-page .cat-card:nth-of-type(even) { border-radius: 29px 29px 11px 29px; }
+
+.home-page .cat-card::before {
+  content: "";
+  position: absolute;
+  left: 25px;
+  bottom: 20px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  color: var(--card-tint-strong, #87bd96);
+  box-shadow: 0 0 0 currentColor, 13px 5px 0 -1px currentColor, 4px 13px 0 -1px currentColor;
+  opacity: .28;
+}
+
+.home-page .forest-card { --card-tint: rgba(169, 218, 176, .3); --card-tint-strong: #63a678; }
+.home-page .festival-card { --card-tint: rgba(244, 199, 203, .38); --card-tint-strong: #d9838e; }
+.home-page .run-card { --card-tint: rgba(245, 217, 154, .42); --card-tint-strong: #d9a451; }
+.home-page .meditation-card { --card-tint: rgba(199, 217, 238, .38); --card-tint-strong: #7695ba; }
+.home-page .reading-card { --card-tint: rgba(226, 198, 171, .36); --card-tint-strong: #a87855; }
+
+.home-page .cat-card .icon.mascot {
+  width: 64px;
+  height: 64px;
+  padding: 6px;
+  border-radius: 22px 22px 22px 8px;
+  background: color-mix(in srgb, var(--card-tint-strong) 12%, white);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.8), 0 8px 18px rgba(36,52,42,.08);
+  transform: rotate(-3deg);
+}
+
+.home-page .cat-card:nth-of-type(even) .icon.mascot { transform: rotate(3deg); }
+.home-page .cat-card:hover .icon.mascot { transform: rotate(0) scale(1.08); }
+.home-page .mascot svg { width: 100%; height: 100%; overflow: visible; }
+
+.home-page .cat-card h2 { font-size: 1.34rem; }
+.home-page .cat-card .cta {
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card-tint-strong) 12%, white);
+  color: color-mix(in srgb, var(--card-tint-strong) 78%, #2e3b33);
+}
+.home-page .cat-card .cta::after { display: none; }
+
+.home-page .badge-soon {
+  border: 2px solid rgba(255,255,255,.75);
+  transform: rotate(3deg);
+  box-shadow: 0 5px 12px rgba(80,60,30,.08);
+}
+
+.home-brand::before {
+  border-radius: 12px 12px 12px 4px;
+  background: rgba(255,255,255,.16);
+  transform: rotate(-4deg);
+}
+
+.site-nav .site-brand::before {
+  content: "✦";
+  display: inline-grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  margin-right: 8px;
+  border-radius: 10px 10px 10px 3px;
+  background: color-mix(in srgb, var(--accent, var(--forest)) 14%, white);
+  color: var(--accent, var(--forest));
+  font-family: sans-serif;
+  font-size: .7rem;
+}
+
+.page header::before {
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent, var(--forest)) 10%, white);
+}
+
+.page form { border-radius: 25px 25px 25px 10px; }
+.page .card { border-radius: 24px 24px 24px 9px; }
+.page .card:nth-child(even) { border-radius: 24px 24px 9px 24px; }
+.page button, .page .apply-btn { border-radius: 14px 14px 14px 6px; }
+
+.coming-card { border-radius: 38px 38px 38px 14px; }
+.coming-card .icon { border-radius: 27px 27px 27px 9px; animation: mascot-float 3.4s ease-in-out infinite; }
+
+@media (max-width: 640px) {
+  .hero-friend { transform: scale(.9); margin-bottom: 5px; }
+  .home-page .hero-content { padding-bottom: 72px; }
+  .home-page .cat-card,
+  .home-page .cat-card:last-child { border-radius: 25px 25px 25px 10px; }
+}
