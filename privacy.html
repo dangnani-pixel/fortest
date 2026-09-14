@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>개인정보처리방침</title>
+<style>
+  :root{
+    --bg:#f6f4ee;
+    --card:#ffffff;
+    --ink:#1f2a20;
+    --muted:#6b7568;
+    --line:#e3e0d5;
+    --accent:#2f7d4f;
+    --gutter:20px;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.7;
+  }
+  .home-link{
+    display:block;
+    max-width:760px;
+    margin:14px auto 0;
+    padding:0 var(--gutter);
+    font-size:0.82rem;
+  }
+  .home-link a{ color:var(--muted); text-decoration:none; }
+  .home-link a:hover{ text-decoration:underline; }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:20px var(--gutter) 60px;
+  }
+  h1{ font-size:1.5rem; margin:10px 0 4px; }
+  .updated{ color:var(--muted); font-size:0.84rem; margin:0 0 28px; }
+  h2{ font-size:1.08rem; margin:28px 0 8px; border-left:3px solid var(--accent); padding-left:10px; }
+  p, li{ font-size:0.92rem; color:var(--ink); }
+  ul{ padding-left:20px; margin:8px 0; }
+  li{ margin:4px 0; }
+  .box{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px 18px;
+    margin:10px 0;
+  }
+  .muted{ color:var(--muted); }
+  code{ background:#eee; padding:1px 5px; border-radius:4px; font-size:0.85em; }
+  footer{ text-align:center; padding:20px; color:var(--muted); font-size:0.76rem; }
+</style>
+</head>
+<body>
+
+<div class="home-link"><a href="/">← 홈으로</a></div>
+
+<div class="wrap">
+  <h1>개인정보처리방침</h1>
+  <p class="updated">최종 수정일: 2026-09-14</p>
+
+  <p>
+    Meliorism(이하 "이 사이트")은 자연휴양림 예약 알림 기능을 위해 구글(Google) 로그인을
+    이용합니다. 이 페이지는 이 과정에서 어떤 정보를 수집·이용·보관하는지 설명합니다.
+  </p>
+
+  <h2>1. 수집하는 정보</h2>
+  <div class="box">
+    <ul>
+      <li>구글 계정 이메일 주소 (로그인 상태 표시용)</li>
+      <li>구글 캘린더 접근을 위한 OAuth 액세스 토큰 및 리프레시 토큰</li>
+    </ul>
+    <p class="muted">이름, 프로필 사진, 그 외 구글 계정 정보는 요청하거나 저장하지 않습니다.</p>
+  </div>
+
+  <h2>2. 이용 목적</h2>
+  <ul>
+    <li>로그인 여부 및 로그인한 이메일을 화면에 표시</li>
+    <li>사용자가 직접 입력한 예약 알림 규칙(요일/시간 또는 특정 날짜)에 따라,
+      사용자 본인의 구글 캘린더에 "🌲 예약 오픈" 일정을 등록</li>
+  </ul>
+  <p>
+    이 목적 외에 이메일이나 캘린더 데이터를 분석, 광고, 마케팅에 이용하지 않습니다.
+  </p>
+
+  <h2>3. 저장 방식과 보관 기간</h2>
+  <p>
+    이 사이트는 별도의 서버 데이터베이스를 두지 않습니다. 로그인 정보는
+    <strong>서명(HMAC)된 HttpOnly 쿠키</strong> 형태로 <strong>사용자의 브라우저에만</strong> 저장되며,
+    서버에는 남지 않습니다. 쿠키는 발급일로부터 <strong>최대 30일</strong> 후 만료되고,
+    언제든 로그아웃하면 즉시 삭제됩니다.
+  </p>
+
+  <h2>4. 제3자 제공</h2>
+  <p>수집한 정보를 외부 업체나 제3자에게 판매·공유·제공하지 않습니다. 구글 캘린더
+    API 호출은 사용자 본인의 캘린더에 일정을 등록하기 위한 것으로, 이 호출 자체가
+    구글과의 통신입니다.</p>
+
+  <h2>5. 이용자의 권리</h2>
+  <ul>
+    <li>사이트에서 로그아웃하면 브라우저에 저장된 로그인 쿠키가 즉시 삭제됩니다.</li>
+    <li>구글 계정의 <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">앱 및 서비스 연결 관리 페이지</a>에서
+      언제든 이 사이트의 접근 권한을 직접 해제할 수 있습니다. 연결을 해제하면
+      발급된 토큰이 즉시 무효화됩니다.</li>
+  </ul>
+
+  <h2>6. 요청하는 권한(스코프)</h2>
+  <div class="box">
+    <ul>
+      <li><code>calendar.events</code> — 사용자가 등록을 요청한 예약 알림 일정을 캘린더에 추가하기 위해 필요</li>
+      <li><code>userinfo.email</code> — 로그인한 계정의 이메일을 화면에 표시하기 위해 필요</li>
+    </ul>
+  </div>
+
+  <h2>7. 문의</h2>
+  <p>이 방침이나 개인정보 처리와 관련해 문의할 사항이 있으면 아래로 연락해 주세요.</p>
+  <p class="muted">문의 이메일: (운영자 이메일 주소를 여기에 채워 넣어 주세요)</p>
+
+  <h2>8. 방침 변경</h2>
+  <p>이 방침은 서비스 변경에 따라 갱신될 수 있으며, 변경 시 이 페이지의 "최종 수정일"을 갱신합니다.</p>
+</div>
+
+<footer>Meliorism</footer>
+
+</body>
+</html>
