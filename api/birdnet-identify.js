@@ -4,7 +4,7 @@
 // 중요: Pl@ntNet과 달리 BirdNET에는 누구나 호출할 수 있는 공개 호스팅 API가 없다.
 // 이 저장소의 `birdnet-server/` 폴더에 바로 배포 가능한 서버(Dockerfile + Flask
 // 앱, birdnet-team/birdnet 파이썬 패키지 기반)를 만들어 뒀다. `birdnet-server/README.md`의
-// 안내대로 Hugging Face Spaces(무료) 등에 올리고, 그 주소를 BIRDNET_SERVER_URL
+// 안내대로 Render.com(무료) 등에 올리고, 그 주소를 BIRDNET_SERVER_URL
 // 환경변수로 등록해야 이 라우트가 동작한다(끝에 /analyze 포함).
 // 등록 전까지는 501을 반환해 화면에 안내 문구를 보여준다.
 //
@@ -67,7 +67,7 @@ module.exports = async (req, res) => {
   if (!serverUrl) {
     res.status(501).json({
       error:
-        '새소리 인식 서버가 아직 연결되지 않았어요. 이 저장소의 birdnet-server 폴더를 Hugging Face Spaces 등에 배포한 뒤, 그 주소를 BIRDNET_SERVER_URL 환경변수로 등록하면 동작해요.',
+        '새소리 인식 서버가 아직 연결되지 않았어요. 이 저장소의 birdnet-server 폴더를 Render.com 등에 배포한 뒤, 그 주소를 BIRDNET_SERVER_URL 환경변수로 등록하면 동작해요.',
       notConfigured: true,
     });
     return;
