@@ -117,6 +117,14 @@ function blobToDataUrl(blob) {
             </div>
           `;
         }).join('');
+
+        let note = '';
+        if (data.koreanLookup && data.koreanLookup !== 'ok') {
+          note = `한국어 이름을 불러오지 못해 영어로 표시했어요 (원인: ${data.koreanLookup}).`;
+        } else if (data.results.some((r) => !r.koreanName)) {
+          note = '위키데이터에 한국어 이름이 등록되지 않은 식물은 영어로 표시돼요.';
+        }
+        if (note) resultsEl.insertAdjacentHTML('beforeend', `<div class="tool-status">${escapeHtml(note)}</div>`);
       }
       statusEl.textContent = '';
     } catch (err) {
