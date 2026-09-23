@@ -67,16 +67,22 @@
 ### 🐦 새소리 인식 — BirdNET
 
 - `api/birdnet-identify.js` — 녹음(최대 15초, `MediaRecorder`) 또는 업로드한 오디오를
-  **직접 호스팅한** [BirdNET-Analyzer](https://github.com/birdnet-team/BirdNET-Analyzer)
-  서버(`python -m birdnet_analyzer.server`)로 전달하고, 감지된 새 목록을 정리해 돌려줍니다.
-- **주의**: Pl@ntNet과 달리 BirdNET-Analyzer는 누구나 호출할 수 있는 공개 호스팅 API가
-  없습니다. GitHub 저장소를 직접 서버(작은 VM, Render, Railway, HuggingFace Spaces 등)에
-  띄우고, 그 주소를 `BIRDNET_SERVER_URL` 환경변수로 등록해야 실제로 동작합니다.
-  등록 전에는 501 응답과 함께 "서버가 아직 연결되지 않았다"는 안내와 대안(코넬대
-  Merlin Bird ID 앱, BirdNET 앱 링크)을 보여줍니다.
-- BirdNET-Analyzer 서버 모드의 응답 형태가 버전마다 조금씩 다를 수 있어(공식으로
-  고정된 스펙이 없음), `normalizeDetections()`가 알려진 몇 가지 형태를 관대하게
-  해석하고, 알아보지 못하면 원본 응답을 그대로 화면에 표시합니다.
+  **직접 호스팅한** BirdNET 서버로 전달하고, 감지된 새 목록을 정리해 돌려줍니다.
+- **주의**: Pl@ntNet과 달리 BirdNET에는 누구나 호출할 수 있는 공개 호스팅 API가 없습니다.
+  `birdnet-server/` 폴더에 **바로 배포 가능한 서버를 직접 만들어 뒀습니다** —
+  [birdnet-team/birdnet](https://github.com/birdnet-team/birdnet) 파이썬 패키지(BirdNET
+  v2.4 모델)를 REST API 한 개(`POST /analyze`)로 감싼 Flask 앱 + Dockerfile입니다.
+  `pip install birdnet`로 실제 설치해서 API(모델 로딩 방식, 결과 DataFrame의 컬럼명)를
+  직접 확인하고 작성했습니다. `birdnet-server/README.md`의 안내대로 Hugging Face
+  Spaces(무료 티어로 충분)에 올리고, 그 주소 + `/analyze`를 `BIRDNET_SERVER_URL`
+  환경변수로 등록해야 실제로 동작합니다. 등록 전에는 501 응답과 함께 "서버가 아직
+  연결되지 않았다"는 안내와 대안(코넬대 Merlin Bird ID 앱, BirdNET 앱 링크)을 보여줍니다.
+  선택적으로 `BIRDNET_API_TOKEN`을 양쪽(Vercel·Spaces)에 같은 값으로 등록하면 아무나
+  이 서버를 호출하지 못하도록 막을 수 있습니다.
+- `birdnet-server`가 반환하는 형태는 `{ detections: [{ start, end, scientificName,
+  commonName, confidence }] }`로 직접 정의했지만, 혹시 다른 BirdNET 서버를 연결하는
+  경우까지 고려해 `normalizeDetections()`가 몇 가지 다른 형태도 관대하게 해석하고,
+  알아보지 못하면 원본 응답을 그대로 화면에 표시합니다.
 
 ## 자연휴양림 예약 (forest.html) 동작 원리
 
