@@ -40,7 +40,14 @@ def get_model():
         import birdnet
         # backend="tf", library="litert": 무거운 TensorFlow 전체 설치 없이
         # 가벼운 LiteRT(TFLite) 런타임만으로 추론한다.
-        _model = birdnet.load("acoustic", "2.4", "tf", library="litert", lang="ko")
+        try:
+            _model = birdnet.load("acoustic", "2.4", "tf", library="litert", lang="ko")
+        except Exception as exc:
+            # 배포 환경에 따라 한국어 라벨(lang="ko")을 못 받아오는 경우가 있어("No
+            # localization available for ko"), 영어 라벨로 대체해서라도 동작하게 한다.
+            # 이 경우 일반명(common name)이 한국어 대신 영어로 나온다.
+            app.logger.warning("한국어 라벨 로드 실패, 영어로 대체합니다: %s", exc)
+            _model = birdnet.load("acoustic", "2.4", "tf", library="litert", lang="en_us")
     return _model
 
 
