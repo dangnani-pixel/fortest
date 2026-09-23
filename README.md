@@ -73,12 +73,15 @@
   [birdnet-team/birdnet](https://github.com/birdnet-team/birdnet) 파이썬 패키지(BirdNET
   v2.4 모델)를 REST API 한 개(`POST /analyze`)로 감싼 Flask 앱 + Dockerfile입니다.
   `pip install birdnet`로 실제 설치해서 API(모델 로딩 방식, 결과 DataFrame의 컬럼명)를
-  직접 확인하고 작성했습니다. `birdnet-server/README.md`의 안내대로 Hugging Face
-  Spaces(무료 티어로 충분)에 올리고, 그 주소 + `/analyze`를 `BIRDNET_SERVER_URL`
-  환경변수로 등록해야 실제로 동작합니다. 등록 전에는 501 응답과 함께 "서버가 아직
-  연결되지 않았다"는 안내와 대안(코넬대 Merlin Bird ID 앱, BirdNET 앱 링크)을 보여줍니다.
-  선택적으로 `BIRDNET_API_TOKEN`을 양쪽(Vercel·Spaces)에 같은 값으로 등록하면 아무나
-  이 서버를 호출하지 못하도록 막을 수 있습니다.
+  직접 확인하고 작성했습니다. `birdnet-server/README.md`의 안내대로 [Render.com](https://render.com/)
+  (무료 티어, 신용카드 불필요)에 올리고, 그 주소 + `/analyze`를 `BIRDNET_SERVER_URL`
+  환경변수로 등록해야 실제로 동작합니다. (Hugging Face Spaces는 2026년 중반부터 Docker
+  SDK가 유료 플랜 전용으로 바뀌어서 Render.com으로 옮겼습니다.) 등록 전에는 501 응답과
+  함께 "서버가 아직 연결되지 않았다"는 안내와 대안(코넬대 Merlin Bird ID 앱, BirdNET 앱
+  링크)을 보여줍니다. 선택적으로 `BIRDNET_API_TOKEN`을 양쪽(Vercel·Render)에 같은 값으로
+  등록하면 아무나 이 서버를 호출하지 못하도록 막을 수 있습니다.
+- 현재 실제로 Render.com에 배포되어 운영 중입니다 (무료 인스턴스라 15분 이상 요청이 없으면
+  슬립 상태가 되고, 다음 요청 때 다시 깨어나는 데 약 50초 이상 걸릴 수 있어요).
 - `birdnet-server`가 반환하는 형태는 `{ detections: [{ start, end, scientificName,
   commonName, confidence }] }`로 직접 정의했지만, 혹시 다른 BirdNET 서버를 연결하는
   경우까지 고려해 `normalizeDetections()`가 몇 가지 다른 형태도 관대하게 해석하고,
