@@ -6,6 +6,8 @@
 // 서버 → Pl@ntNet: multipart/form-data (images, organs)
 // 발급: https://my.plantnet.org/ 에서 무료 계정 생성 후 API 키 발급
 
+const { lookupKoreanNames } = require('./_lib/korean-names');
+
 const VALID_ORGANS = ['leaf', 'flower', 'fruit', 'bark', 'habit', 'other'];
 const PROJECT = 'all'; // 특정 지역/분류군으로 좁히고 싶으면 Pl@ntNet 프로젝트 코드로 변경 가능
 
@@ -13,42 +15,6 @@ function parseDataUrl(dataUrl) {
   const match = /^data:([^;]+);base64,(.+)$/.exec(dataUrl || '');
   if (!match) return null;
   return { mime: match[1], buffer: Buffer.from(match[2], 'base64') };
-}
-
-// 학명(P225, taxon name)으로 위키데이터에 등록된 한국어 이름을 찾는다. 실패하면 map은 비고
-// status에 원인이 담기며, 화면에는 영어 일반명이 그대로 표시된다.
-async function lookupKoreanNames(scientificNames) {
-  const names = [...new Set(scientificNames.filter(Boolean))];
-  if (!names.length) return { map: {}, status: 'ok' };
-
-  const values = names.map((n) => `"${n.replace(/["\\]/g, '')}"`).join(' ');
-  const query = `SELECT ?name ?label WHERE {
-    VALUES ?name { ${values} }
-    ?item wdt:P225 ?name ; rdfs:label ?label .
-    FILTER(LANG(?label) = "ko")
-  }`;
-
-  try {
-    const resp = await fetch(`https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(query)}`, {
-      headers: {
-        Accept: 'application/sparql-results+json',
-        'User-Agent': 'Meliorism/1.0 (https://github.com/dangnani-pixel/fortest)',
-      },
-      signal: AbortSignal.timeout(4000),
-    });
-    if (!resp.ok) return { map: {}, status: `HTTP ${resp.status}` };
-    const data = await resp.json();
-    const map = {};
-    for (const b of data.results?.bindings || []) {
-      const name = b.name?.value;
-      const label = b.label?.value;
-      // 한국어 라벨 자리에 학명을 그대로 넣어둔 항목은 번역이 아니므로 건너뛴다.
-      if (name && label && label !== name && !map[name]) map[name] = label;
-    }
-    return { map, status: 'ok' };
-  } catch (err) {
-    return { map: {}, status: err.name === 'TimeoutError' ? '시간 초과' : err.message || '알 수 없는 오류' };
-  }
 }
 
 module.exports = async (req, res) => {

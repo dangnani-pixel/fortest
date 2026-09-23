@@ -11,6 +11,8 @@
 // 클라이언트 → 서버: JSON { audio: "data:audio/webm;base64,...", filename }
 // 서버(이 파일) → birdnet-server: multipart/form-data (audio 필드)
 
+const { lookupKoreanNames, hasHangul } = require('./_lib/korean-names');
+
 function parseDataUrl(dataUrl) {
   const match = /^data:([^;]+);base64,(.+)$/.exec(dataUrl || '');
   if (!match) return null;
@@ -116,7 +118,11 @@ module.exports = async (req, res) => {
     const detections = normalizeDetections(data);
     res.setHeader('Cache-Control', 'no-store');
     if (detections) {
-      res.status(200).json({ detections });
+      // BirdNET 한국어 라벨에 번역이 없는 종은 영어로 나오므로, 그런 종만 위키데이터에서 한국어 이름을 찾는다.
+      const missing = detections.filter((d) => !hasHangul(d.commonName)).map((d) => d.scientificName);
+      const korean = await lookupKoreanNames(missing);
+      for (const d of detections) d.koreanName = hasHangul(d.commonName) ? d.commonName : korean.map[d.scientificName] || '';
+      res.status(200).json({ detections, koreanLookup: korean.status });
     } else {
       // 알려지지 않은 응답 형태 — 원본을 그대로 내려서 화면에서 확인할 수 있게 한다.
       res.status(200).json({ detections: [], raw: data });
