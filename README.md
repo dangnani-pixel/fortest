@@ -60,9 +60,17 @@
 - `api/plantnet-identify.js` — 클라이언트가 보낸 사진(긴 변 1024px로 리사이즈해 전송)을
   [Pl@ntNet](https://plantnet.org) 식물 인식 API(`my-api.plantnet.org/v2/identify`)로
   전달하고, 상위 5개 후보(일반명·학명·과·일치율·참고 이미지)를 정리해 돌려줍니다.
-  Pl@ntNet은 한국어(`lang=ko`)를 지원하지 않아, 학명으로 [위키데이터](https://www.wikidata.org)에
-  등록된 한국어 이름을 조회해 표시합니다(무료, 키 불필요). 한국어 이름이 등록되지 않은 종이나
-  조회에 실패한 경우에는 영어 일반명이 표시됩니다.
+  Pl@ntNet은 한국어(`lang=ko`)를 지원하지 않아, 학명으로 한국어 이름을 따로 조회합니다
+  (`api/_lib/korean-names.js`, 새소리 인식과 공용).
+  1. [위키데이터](https://www.wikidata.org) — 여러 종을 한 번에 조회(무료, 키 불필요)
+  2. 위키데이터에 없는 종만 **국가생물종지식정보시스템**(국립수목원, 공공데이터포털) 조회
+     - 식물: `KpniService/scnmSearch`(국가표준식물목록, `reqScnm`=학명) → `plantGnrlNm`(국명)
+     - 새: `BirdService/birdIlstrSearch`(조류자원서비스, `st=2` 학명 검색) → `anmlGnrlNm`(국명)
+     - API 쪽 학명에는 명명자·연도가 붙어 있어("Jynx torquilla Linnaeus, 1758"), 속명+종소명
+       두 단어가 일치하는 항목을 고릅니다(식물은 정명 우선).
+     - 인증키는 축제 API와 같은 `TOUR_API_KEY`를 씁니다(공공데이터포털 인증키는 계정당 하나).
+  - 둘 다에서 못 찾으면 영어 일반명을 표시하고, 조회에 실패하면 결과 아래에 원인을 보여줍니다.
+    국가표준식물목록은 한국에 있는 식물만 다루므로 외국 식물은 영어로 남을 수 있습니다.
 - 필요한 환경변수: `PLANTNET_API_KEY` ([my.plantnet.org](https://my.plantnet.org/)에서 무료
   계정 생성 후 발급). 설정 전에는 501 응답과 함께 발급 안내 문구를 보여줍니다.
 - Pl@ntNet은 누구나 호출 가능한 공개 REST API를 제공하기 때문에 바로 연동했습니다.
@@ -83,8 +91,8 @@
   함께 "서버가 아직 연결되지 않았다"는 안내와 대안(코넬대 Merlin Bird ID 앱, BirdNET 앱
   링크)을 보여줍니다. 선택적으로 `BIRDNET_API_TOKEN`을 양쪽(Vercel·Render)에 같은 값으로
   등록하면 아무나 이 서버를 호출하지 못하도록 막을 수 있습니다.
-- BirdNET 한국어 라벨에 번역이 없어 영어로 나오는 종은, 식물과 같은 방식으로 학명으로
-  위키데이터의 한국어 이름을 조회해 표시합니다(`api/_lib/korean-names.js` 공용).
+- BirdNET 한국어 라벨에 번역이 없어 영어로 나오는 종은, 식물과 같은 방식(위키데이터 →
+  국가생물종지식정보시스템 조류자원서비스)으로 한국어 이름을 조회해 표시합니다.
 - 현재 실제로 Render.com에 배포되어 운영 중입니다 (무료 인스턴스라 15분 이상 요청이 없으면
   슬립 상태가 되고, 다음 요청 때 다시 깨어나는 데 약 50초 이상 걸릴 수 있어요).
 - `birdnet-server`가 반환하는 형태는 `{ detections: [{ start, end, scientificName,
