@@ -253,6 +253,7 @@ select:focus-visible {
 
 .festival-page { --accent: #b86652; --accent-ink: #fff; }
 .marathon-page { --accent: #a95e43; --accent-ink: #fff; }
+.nature-page { --accent: #3f8f74; --accent-ink: #fff; }
 
 .site-nav {
   width: min(1080px, calc(100% - 40px));
@@ -570,7 +571,7 @@ select:focus-visible {
 .home-page .forest-card { --card-tint: rgba(169, 218, 176, .3); --card-tint-strong: #63a678; }
 .home-page .festival-card { --card-tint: rgba(244, 199, 203, .38); --card-tint-strong: #d9838e; }
 .home-page .run-card { --card-tint: rgba(245, 217, 154, .42); --card-tint-strong: #d9a451; }
-.home-page .meditation-card { --card-tint: rgba(199, 217, 238, .38); --card-tint-strong: #7695ba; }
+.home-page .nature-card { --card-tint: rgba(163, 209, 199, .38); --card-tint-strong: #4f9c8a; }
 .home-page .reading-card { --card-tint: rgba(226, 198, 171, .36); --card-tint-strong: #a87855; }
 
 .home-page .cat-card .icon.mascot {

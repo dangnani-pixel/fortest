@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>자연과 교감</title>
+<style>
+  :root{
+    --bg:#f6f4ee;
+    --card:#ffffff;
+    --ink:#1f2a20;
+    --muted:#6b7568;
+    --line:#e3e0d5;
+    --accent:#3f8f74;
+    --accent-bg:#e5f2ec;
+    --accent-ink:#ffffff;
+    --amber:#9a6b12;
+    --amber-bg:#fbeed4;
+    --gutter:20px;
+  }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0;
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  header{
+    max-width:960px;
+    margin:0 auto;
+    padding:10px var(--gutter) 18px;
+    text-align:center;
+  }
+  header h1{ margin:0 0 6px; font-size:1.6rem; }
+  header p{ margin:0; color:var(--muted); font-size:0.92rem; }
+
+  .tool-grid{
+    max-width:960px;
+    margin:14px auto 60px;
+    padding:0 var(--gutter);
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    align-items:start;
+  }
+  @media (max-width:820px){
+    .tool-grid{ grid-template-columns:1fr; }
+  }
+
+  .tool-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .tool-card h2{
+    margin:0;
+    font-size:1.12rem;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .tool-tag{
+    font-size:0.68rem;
+    font-weight:700;
+    color:var(--accent);
+    background:var(--accent-bg);
+    border-radius:999px;
+    padding:2px 9px;
+  }
+  .tool-desc{ margin:0; font-size:0.86rem; color:var(--muted); line-height:1.5; }
+
+  .field-row{ display:flex; flex-wrap:wrap; gap:10px; align-items:stretch; }
+  .field{ display:flex; flex-direction:column; gap:4px; flex:1 1 140px; }
+  .field label{ font-size:0.78rem; color:var(--muted); }
+  .field select{
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:0.9rem;
+    background:#fff;
+    font-family:inherit;
+  }
+
+  .upload-box{
+    flex:2 1 200px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:14px 10px;
+    border:1.5px dashed var(--line);
+    border-radius:10px;
+    font-size:0.88rem;
+    color:var(--accent);
+    font-weight:600;
+    cursor:pointer;
+    background:var(--accent-bg);
+  }
+  .upload-box:hover{ filter:brightness(0.97); }
+
+  .preview{ border-radius:10px; overflow:hidden; border:1px solid var(--line); }
+  .preview img{ display:block; width:100%; max-height:260px; object-fit:cover; }
+
+  .rec-controls{ display:flex; align-items:center; gap:12px; }
+  .rec-timer{ font-variant-numeric:tabular-nums; font-size:0.86rem; color:var(--muted); }
+  .or-divider{ text-align:center; font-size:0.76rem; color:var(--muted); margin:-2px 0; }
+  .or-divider::before, .or-divider::after{ content:none; }
+
+  audio{ width:100%; }
+
+  button.btn{
+    padding:11px 0;
+    border:none;
+    border-radius:8px;
+    background:var(--accent);
+    color:var(--accent-ink);
+    font-size:0.92rem;
+    font-weight:700;
+    cursor:pointer;
+  }
+  button.btn.ghost{
+    background:#fff;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    padding:9px 16px;
+  }
+  button.btn.ghost.recording{
+    background:#b3432b;
+    border-color:#b3432b;
+    color:#fff;
+  }
+  button.btn:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .tool-status{ font-size:0.84rem; color:var(--muted); min-height:1.2em; }
+  .tool-status.error{ color:#b3432b; }
+
+  .result-list{ display:flex; flex-direction:column; gap:10px; }
+  .result-item{
+    display:flex;
+    gap:12px;
+    padding:10px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#f9f8f4;
+  }
+  .result-item img{ width:64px; height:64px; object-fit:cover; border-radius:8px; flex-shrink:0; background:#eee; }
+  .result-body{ flex:1; min-width:0; }
+  .result-name{ font-weight:700; font-size:0.92rem; }
+  .result-sci{ font-style:italic; color:var(--muted); font-size:0.8rem; }
+  .result-score{
+    display:inline-block;
+    margin-top:4px;
+    font-size:0.72rem;
+    font-weight:700;
+    color:var(--accent);
+    background:var(--accent-bg);
+    border-radius:999px;
+    padding:2px 8px;
+  }
+
+  .notice-box{
+    background:var(--amber-bg);
+    color:var(--amber);
+    border-left:3px solid var(--amber);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:0.82rem;
+    line-height:1.55;
+  }
+  .notice-box a{ color:var(--amber); font-weight:700; }
+
+  footer{ text-align:center; padding:20px; color:var(--muted); font-size:0.76rem; line-height:1.6; }
+  footer a{ color:var(--muted); }
+</style>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body class="page nature-page">
+
+<nav class="site-nav" aria-label="사이트 탐색">
+  <a class="site-brand" href="/">Meliorism</a>
+  <a class="back-link" href="/">← 모든 카테고리</a>
+</nav>
+
+<header>
+  <h1>🌿🐦 자연과 교감</h1>
+  <p>사진 속 식물은 Pl@ntNet으로, 녹음한 새소리는 BirdNET으로 무엇인지 알아보세요.</p>
+</header>
+
+<div class="tool-grid">
+
+  <section class="tool-card" id="plantTool">
+    <h2>🌿 식물 인식 <span class="tool-tag">Pl@ntNet</span></h2>
+    <p class="tool-desc">잎·꽃·열매 사진 한 장이면 충분해요. 어떤 부위를 찍었는지 알려주시면 더 정확해져요.</p>
+
+    <div class="field-row">
+      <label class="upload-box" for="plantFile">
+        <input type="file" id="plantFile" accept="image/*" capture="environment" hidden />
+        <span id="plantUploadLabel">📷 사진 선택 / 촬영</span>
+      </label>
+      <div class="field">
+        <label for="plantOrgan">촬영 부위</label>
+        <select id="plantOrgan">
+          <option value="leaf">잎</option>
+          <option value="flower">꽃</option>
+          <option value="fruit">열매</option>
+          <option value="bark">나무껍질</option>
+          <option value="habit">전체 모양</option>
+          <option value="other">기타</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="preview" id="plantPreview" hidden><img id="plantPreviewImg" alt="선택한 사진 미리보기" /></div>
+
+    <button type="button" class="btn" id="plantSubmit" disabled>식물 인식하기</button>
+    <div class="tool-status" id="plantStatus"></div>
+    <div class="result-list" id="plantResults"></div>
+  </section>
+
+  <section class="tool-card" id="birdTool">
+    <h2>🐦 새소리 인식 <span class="tool-tag">BirdNET</span></h2>
+    <p class="tool-desc">주변 새소리를 5~15초 정도 녹음하거나, 가지고 있는 오디오 파일을 올려보세요.</p>
+
+    <div class="rec-controls">
+      <button type="button" class="btn ghost" id="recordBtn">🎙️ 녹음 시작</button>
+      <span class="rec-timer" id="recTimer">00:00</span>
+    </div>
+    <div class="or-divider">또는</div>
+    <label class="upload-box" for="birdFile">
+      <input type="file" id="birdFile" accept="audio/*" hidden />
+      <span id="birdUploadLabel">🎵 오디오 파일 선택</span>
+    </label>
+
+    <audio id="birdAudioPreview" controls hidden></audio>
+
+    <button type="button" class="btn" id="birdSubmit" disabled>새소리 인식하기</button>
+    <div class="tool-status" id="birdStatus"></div>
+    <div class="result-list" id="birdResults"></div>
+  </section>
+
+</div>
+
+<footer>
+  Pl@ntNet(plantnet.org)·BirdNET-Analyzer(<a href="https://github.com/birdnet-team/BirdNET-Analyzer" target="_blank" rel="noopener">birdnet-team/BirdNET-Analyzer</a>) 기반 · 인식 결과는 참고용이며 실제와 다를 수 있어요.
+</footer>
+
+<script src="nature.js"></script>
+</body>
+</html>
