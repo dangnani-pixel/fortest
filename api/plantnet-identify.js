@@ -6,7 +6,7 @@
 // 서버 → Pl@ntNet: multipart/form-data (images, organs)
 // 발급: https://my.plantnet.org/ 에서 무료 계정 생성 후 API 키 발급
 
-const { lookupKoreanNames } = require('./_lib/korean-names');
+const { findKoreanNames } = require('./_lib/korean-names');
 
 const VALID_ORGANS = ['leaf', 'flower', 'fruit', 'bark', 'habit', 'other'];
 const PROJECT = 'all'; // 특정 지역/분류군으로 좁히고 싶으면 Pl@ntNet 프로젝트 코드로 변경 가능
@@ -76,7 +76,7 @@ module.exports = async (req, res) => {
       image: r.images?.[0]?.url?.m || r.images?.[0]?.url?.s || '',
     }));
 
-    const korean = await lookupKoreanNames(results.map((r) => r.scientificName));
+    const korean = await findKoreanNames(results.map((r) => r.scientificName), 'plant');
     for (const r of results) r.koreanName = korean.map[r.scientificName] || '';
 
     res.setHeader('Cache-Control', 'no-store');

@@ -9,8 +9,8 @@ function escapeHtml(s) {
 // 한국어 이름을 못 찾은 결과가 있을 때 그 이유를 결과 아래에 알려준다.
 function koreanNameNote(lookupStatus, items, noun) {
   let note = '';
-  if (lookupStatus && lookupStatus !== 'ok') {
-    note = `한국어 이름을 불러오지 못해 영어로 표시했어요 (원인: ${lookupStatus}).`;
+  if (lookupStatus && lookupStatus !== 'ok' && items.some((r) => !r.koreanName)) {
+    note = `한국어 이름을 일부 불러오지 못해 영어로 표시했어요 (원인: ${lookupStatus}).`;
   } else if (items.some((r) => !r.koreanName)) {
     note = `한국어 이름이 등록되지 않은 ${noun} 영어로 표시돼요.`;
   }
