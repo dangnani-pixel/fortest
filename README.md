@@ -83,6 +83,8 @@
   함께 "서버가 아직 연결되지 않았다"는 안내와 대안(코넬대 Merlin Bird ID 앱, BirdNET 앱
   링크)을 보여줍니다. 선택적으로 `BIRDNET_API_TOKEN`을 양쪽(Vercel·Render)에 같은 값으로
   등록하면 아무나 이 서버를 호출하지 못하도록 막을 수 있습니다.
+- BirdNET 한국어 라벨에 번역이 없어 영어로 나오는 종은, 식물과 같은 방식으로 학명으로
+  위키데이터의 한국어 이름을 조회해 표시합니다(`api/_lib/korean-names.js` 공용).
 - 현재 실제로 Render.com에 배포되어 운영 중입니다 (무료 인스턴스라 15분 이상 요청이 없으면
   슬립 상태가 되고, 다음 요청 때 다시 깨어나는 데 약 50초 이상 걸릴 수 있어요).
 - `birdnet-server`가 반환하는 형태는 `{ detections: [{ start, end, scientificName,

@@ -6,6 +6,17 @@ function escapeHtml(s) {
   }[c]));
 }
 
+// 한국어 이름을 못 찾은 결과가 있을 때 그 이유를 결과 아래에 알려준다.
+function koreanNameNote(lookupStatus, items, noun) {
+  let note = '';
+  if (lookupStatus && lookupStatus !== 'ok') {
+    note = `한국어 이름을 불러오지 못해 영어로 표시했어요 (원인: ${lookupStatus}).`;
+  } else if (items.some((r) => !r.koreanName)) {
+    note = `한국어 이름이 등록되지 않은 ${noun} 영어로 표시돼요.`;
+  }
+  return note ? `<div class="tool-status">${escapeHtml(note)}</div>` : '';
+}
+
 // ---------- 이미지 리사이즈 (업로드 용량을 줄이기 위해 긴 변 1024px로 축소) ----------
 function resizeImageToDataUrl(file, maxSize = 1024, quality = 0.85) {
   return new Promise((resolve, reject) => {
@@ -116,15 +127,7 @@ function blobToDataUrl(blob) {
               </div>
             </div>
           `;
-        }).join('');
-
-        let note = '';
-        if (data.koreanLookup && data.koreanLookup !== 'ok') {
-          note = `한국어 이름을 불러오지 못해 영어로 표시했어요 (원인: ${data.koreanLookup}).`;
-        } else if (data.results.some((r) => !r.koreanName)) {
-          note = '위키데이터에 한국어 이름이 등록되지 않은 식물은 영어로 표시돼요.';
-        }
-        if (note) resultsEl.insertAdjacentHTML('beforeend', `<div class="tool-status">${escapeHtml(note)}</div>`);
+        }).join('') + koreanNameNote(data.koreanLookup, data.results, '식물은');
       }
       statusEl.textContent = '';
     } catch (err) {
@@ -262,18 +265,19 @@ function blobToDataUrl(blob) {
       } else if (!data.detections?.length) {
         resultsEl.innerHTML = '<div class="tool-status">새소리를 찾지 못했어요. 좀 더 가까이에서 다시 녹음해 보세요.</div>';
       } else {
-        resultsEl.innerHTML = data.detections.slice(0, 5).map((d) => {
+        const shown = data.detections.slice(0, 5);
+        resultsEl.innerHTML = shown.map((d) => {
           const pct = d.confidence != null ? Math.round(d.confidence * 100) : null;
           return `
             <div class="result-item">
               <div class="result-body">
-                <div class="result-name">${escapeHtml(d.commonName || d.scientificName)}</div>
-                ${d.scientificName ? `<div class="result-sci">${escapeHtml(d.scientificName)}</div>` : ''}
+                <div class="result-name">${escapeHtml(d.koreanName || d.commonName || d.scientificName)}</div>
+                ${d.scientificName ? `<div class="result-sci">${escapeHtml(d.koreanName && d.commonName && d.koreanName !== d.commonName ? `${d.scientificName} · ${d.commonName}` : d.scientificName)}</div>` : ''}
                 ${pct != null ? `<span class="result-score">신뢰도 ${pct}%</span>` : ''}
               </div>
             </div>
           `;
-        }).join('');
+        }).join('') + koreanNameNote(data.koreanLookup, shown, '새는');
       }
       statusEl.textContent = '';
     } catch (err) {
