@@ -1,13 +1,15 @@
 // /api/birdnet-identify.js
-// BirdNET-Analyzer(https://github.com/birdnet-team/BirdNET-Analyzer) "서버 모드" 프록시.
+// BirdNET 새소리 인식 서버 프록시.
 //
 // 중요: Pl@ntNet과 달리 BirdNET에는 누구나 호출할 수 있는 공개 호스팅 API가 없다.
-// birdnet-team/BirdNET-Analyzer를 직접 서버(예: `python -m birdnet_analyzer.server`)로
-// 띄워야 하고, 그 주소를 BIRDNET_SERVER_URL 환경변수로 등록해야 이 라우트가 동작한다.
+// 이 저장소의 `birdnet-server/` 폴더에 바로 배포 가능한 서버(Dockerfile + Flask
+// 앱, birdnet-team/birdnet 파이썬 패키지 기반)를 만들어 뒀다. `birdnet-server/README.md`의
+// 안내대로 Hugging Face Spaces(무료) 등에 올리고, 그 주소를 BIRDNET_SERVER_URL
+// 환경변수로 등록해야 이 라우트가 동작한다(끝에 /analyze 포함).
 // 등록 전까지는 501을 반환해 화면에 안내 문구를 보여준다.
 //
 // 클라이언트 → 서버: JSON { audio: "data:audio/webm;base64,...", filename }
-// 서버 → BirdNET 서버: multipart/form-data (audio, meta)
+// 서버(이 파일) → birdnet-server: multipart/form-data (audio 필드)
 
 function parseDataUrl(dataUrl) {
   const match = /^data:([^;]+);base64,(.+)$/.exec(dataUrl || '');
@@ -29,10 +31,10 @@ function normalizeDetections(data) {
       rows.push({ start, end, scientificName: sci || name, commonName: common || '', confidence: conf });
     } else if (r && typeof r === 'object') {
       rows.push({
-        start: r.start_time ?? r.start ?? null,
-        end: r.end_time ?? r.end ?? null,
-        scientificName: r.scientific_name ?? r.sci_name ?? r.label?.split('_')?.[0] ?? '',
-        commonName: r.common_name ?? r.label?.split('_')?.[1] ?? '',
+        start: r.start ?? r.start_time ?? null,
+        end: r.end ?? r.end_time ?? null,
+        scientificName: r.scientificName ?? r.scientific_name ?? r.sci_name ?? r.label?.split('_')?.[0] ?? '',
+        commonName: r.commonName ?? r.common_name ?? r.label?.split('_')?.[1] ?? '',
         confidence: r.confidence ?? r.score ?? null,
       });
     }
@@ -65,7 +67,7 @@ module.exports = async (req, res) => {
   if (!serverUrl) {
     res.status(501).json({
       error:
-        '새소리 인식 서버가 아직 연결되지 않았어요. BirdNET-Analyzer(github.com/birdnet-team/BirdNET-Analyzer)를 서버 모드로 직접 호스팅한 뒤, 그 주소를 BIRDNET_SERVER_URL 환경변수로 등록하면 동작해요.',
+        '새소리 인식 서버가 아직 연결되지 않았어요. 이 저장소의 birdnet-server 폴더를 Hugging Face Spaces 등에 배포한 뒤, 그 주소를 BIRDNET_SERVER_URL 환경변수로 등록하면 동작해요.',
       notConfigured: true,
     });
     return;
@@ -91,7 +93,12 @@ module.exports = async (req, res) => {
       JSON.stringify({ lat: -1, lon: -1, date: new Date().toISOString().slice(0, 10), min_conf: 0.25 })
     );
 
-    const resp = await fetch(serverUrl, { method: 'POST', body: form });
+    const apiToken = process.env.BIRDNET_API_TOKEN;
+    const resp = await fetch(serverUrl, {
+      method: 'POST',
+      headers: apiToken ? { 'X-Api-Key': apiToken } : undefined,
+      body: form,
+    });
     const text = await resp.text();
     let data;
     try {
