@@ -15,6 +15,42 @@ function parseDataUrl(dataUrl) {
   return { mime: match[1], buffer: Buffer.from(match[2], 'base64') };
 }
 
+// 학명(P225, taxon name)으로 위키데이터에 등록된 한국어 이름을 찾는다. 실패하면 빈 객체를 돌려주고
+// 화면에는 영어 일반명이 그대로 표시된다.
+async function lookupKoreanNames(scientificNames) {
+  const names = [...new Set(scientificNames.filter(Boolean))];
+  if (!names.length) return {};
+
+  const values = names.map((n) => `"${n.replace(/["\\]/g, '')}"`).join(' ');
+  const query = `SELECT ?name ?label WHERE {
+    VALUES ?name { ${values} }
+    ?item wdt:P225 ?name ; rdfs:label ?label .
+    FILTER(LANG(?label) = "ko")
+  }`;
+
+  try {
+    const resp = await fetch(`https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(query)}`, {
+      headers: {
+        Accept: 'application/sparql-results+json',
+        'User-Agent': 'Meliorism/1.0 (https://github.com/dangnani-pixel/fortest)',
+      },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!resp.ok) return {};
+    const data = await resp.json();
+    const map = {};
+    for (const b of data.results?.bindings || []) {
+      const name = b.name?.value;
+      const label = b.label?.value;
+      // 한국어 라벨 자리에 학명을 그대로 넣어둔 항목은 번역이 아니므로 건너뛴다.
+      if (name && label && label !== name && !map[name]) map[name] = label;
+    }
+    return map;
+  } catch {
+    return {};
+  }
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'POST 요청만 지원합니다.' });
@@ -73,6 +109,9 @@ module.exports = async (req, res) => {
       commonNames: r.species?.commonNames || [],
       image: r.images?.[0]?.url?.m || r.images?.[0]?.url?.s || '',
     }));
+
+    const koreanNames = await lookupKoreanNames(results.map((r) => r.scientificName));
+    for (const r of results) r.koreanName = koreanNames[r.scientificName] || '';
 
     res.setHeader('Cache-Control', 'no-store');
     res.status(200).json({ results });
