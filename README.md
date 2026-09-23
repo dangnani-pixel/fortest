@@ -1,6 +1,6 @@
 # Meliorism
 
-자연휴양림 예약 / 전국 축제 일정 / 마라톤 대회 / 명상 / 독서, 다섯 가지 카테고리로 구성된 사이트입니다.
+자연휴양림 예약 / 전국 축제 일정 / 마라톤 대회 / 자연과 교감 / 독서, 다섯 가지 카테고리로 구성된 사이트입니다.
 
 ## 페이지 구성
 
@@ -9,7 +9,7 @@
 - `forest.html` — **자연휴양림 예약** (기존에 만들던 실시간 빈자리 조회 + 예약 알림 기능 전체)
 - `festivals.html` — **전국 축제 일정** (오늘~6개월 뒤까지, 지역별 축제 + 예약 안내)
 - `marathon.html` — **마라톤 대회** (공공데이터 스냅샷 기반 검색·필터·정렬)
-- `meditation.html` — **명상** (준비 중 안내 페이지). 컨셉: 명상하기 좋은 곳 추천
+- `nature.html` — **자연과 교감** (Pl@ntNet 식물 인식 + BirdNET 새소리 인식)
 - `reading.html` — **독서** (준비 중 안내 페이지). 컨셉: 나의 세계의 확장
 
 ## 전국 축제 일정 (festivals.html) 동작 원리
@@ -48,6 +48,35 @@
   확인 시점(2026-09-07) 기준 공식 발표된 게 없어 목록에 포함하지 못했습니다.
 - 지난 대회는 목록에 남겨두지 않으므로, 날짜가 지나면 `RACE_DATA`에서 해당 항목을
   수동으로 지워야 합니다. 새 대회가 확정되면 배열에 추가하면 됩니다.
+
+## 자연과 교감 (nature.html) 동작 원리
+
+사진 한 장으로 식물을, 녹음 하나로 새소리를 알아보는 페이지입니다. 두 기능 모두
+브라우저에서 이미지/오디오를 서버(Vercel Serverless Function)로 보내고, 서버가
+외부 API 인증키를 숨긴 채 대신 호출해서 결과만 돌려주는 구조입니다.
+
+### 🌿 식물 인식 — Pl@ntNet
+
+- `api/plantnet-identify.js` — 클라이언트가 보낸 사진(긴 변 1024px로 리사이즈해 전송)을
+  [Pl@ntNet](https://plantnet.org) 식물 인식 API(`my-api.plantnet.org/v2/identify`)로
+  전달하고, 상위 5개 후보(국명·학명·과·일치율·참고 이미지)를 정리해 돌려줍니다.
+- 필요한 환경변수: `PLANTNET_API_KEY` ([my.plantnet.org](https://my.plantnet.org/)에서 무료
+  계정 생성 후 발급). 설정 전에는 501 응답과 함께 발급 안내 문구를 보여줍니다.
+- Pl@ntNet은 누구나 호출 가능한 공개 REST API를 제공하기 때문에 바로 연동했습니다.
+
+### 🐦 새소리 인식 — BirdNET
+
+- `api/birdnet-identify.js` — 녹음(최대 15초, `MediaRecorder`) 또는 업로드한 오디오를
+  **직접 호스팅한** [BirdNET-Analyzer](https://github.com/birdnet-team/BirdNET-Analyzer)
+  서버(`python -m birdnet_analyzer.server`)로 전달하고, 감지된 새 목록을 정리해 돌려줍니다.
+- **주의**: Pl@ntNet과 달리 BirdNET-Analyzer는 누구나 호출할 수 있는 공개 호스팅 API가
+  없습니다. GitHub 저장소를 직접 서버(작은 VM, Render, Railway, HuggingFace Spaces 등)에
+  띄우고, 그 주소를 `BIRDNET_SERVER_URL` 환경변수로 등록해야 실제로 동작합니다.
+  등록 전에는 501 응답과 함께 "서버가 아직 연결되지 않았다"는 안내와 대안(코넬대
+  Merlin Bird ID 앱, BirdNET 앱 링크)을 보여줍니다.
+- BirdNET-Analyzer 서버 모드의 응답 형태가 버전마다 조금씩 다를 수 있어(공식으로
+  고정된 스펙이 없음), `normalizeDetections()`가 알려진 몇 가지 형태를 관대하게
+  해석하고, 알아보지 못하면 원본 응답을 그대로 화면에 표시합니다.
 
 ## 자연휴양림 예약 (forest.html) 동작 원리
 
