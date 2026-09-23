@@ -48,10 +48,10 @@ module.exports = async (req, res) => {
     form.append('images', new Blob([parsed.buffer], { type: parsed.mime }), `photo.${ext}`);
     form.append('organs', organ);
 
+    // lang=ko는 Pl@ntNet이 지원하지 않아 "No localization available for ko" 오류가 나므로 기본값(영어)을 쓴다.
     const params = new URLSearchParams({
       'api-key': apiKey,
       'include-related-images': 'true',
-      lang: 'ko',
     });
 
     const resp = await fetch(`https://my-api.plantnet.org/v2/identify/${PROJECT}?${params.toString()}`, {
