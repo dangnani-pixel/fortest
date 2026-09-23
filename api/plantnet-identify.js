@@ -15,11 +15,11 @@ function parseDataUrl(dataUrl) {
   return { mime: match[1], buffer: Buffer.from(match[2], 'base64') };
 }
 
-// 학명(P225, taxon name)으로 위키데이터에 등록된 한국어 이름을 찾는다. 실패하면 빈 객체를 돌려주고
-// 화면에는 영어 일반명이 그대로 표시된다.
+// 학명(P225, taxon name)으로 위키데이터에 등록된 한국어 이름을 찾는다. 실패하면 map은 비고
+// status에 원인이 담기며, 화면에는 영어 일반명이 그대로 표시된다.
 async function lookupKoreanNames(scientificNames) {
   const names = [...new Set(scientificNames.filter(Boolean))];
-  if (!names.length) return {};
+  if (!names.length) return { map: {}, status: 'ok' };
 
   const values = names.map((n) => `"${n.replace(/["\\]/g, '')}"`).join(' ');
   const query = `SELECT ?name ?label WHERE {
@@ -36,7 +36,7 @@ async function lookupKoreanNames(scientificNames) {
       },
       signal: AbortSignal.timeout(4000),
     });
-    if (!resp.ok) return {};
+    if (!resp.ok) return { map: {}, status: `HTTP ${resp.status}` };
     const data = await resp.json();
     const map = {};
     for (const b of data.results?.bindings || []) {
@@ -45,9 +45,9 @@ async function lookupKoreanNames(scientificNames) {
       // 한국어 라벨 자리에 학명을 그대로 넣어둔 항목은 번역이 아니므로 건너뛴다.
       if (name && label && label !== name && !map[name]) map[name] = label;
     }
-    return map;
-  } catch {
-    return {};
+    return { map, status: 'ok' };
+  } catch (err) {
+    return { map: {}, status: err.name === 'TimeoutError' ? '시간 초과' : err.message || '알 수 없는 오류' };
   }
 }
 
@@ -110,11 +110,11 @@ module.exports = async (req, res) => {
       image: r.images?.[0]?.url?.m || r.images?.[0]?.url?.s || '',
     }));
 
-    const koreanNames = await lookupKoreanNames(results.map((r) => r.scientificName));
-    for (const r of results) r.koreanName = koreanNames[r.scientificName] || '';
+    const korean = await lookupKoreanNames(results.map((r) => r.scientificName));
+    for (const r of results) r.koreanName = korean.map[r.scientificName] || '';
 
     res.setHeader('Cache-Control', 'no-store');
-    res.status(200).json({ results });
+    res.status(200).json({ results, koreanLookup: korean.status });
   } catch (err) {
     res.status(500).json({ error: err.message || '식물 인식 중 오류가 발생했어요.' });
   }
