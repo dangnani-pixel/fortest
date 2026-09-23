@@ -60,7 +60,9 @@
 - `api/plantnet-identify.js` — 클라이언트가 보낸 사진(긴 변 1024px로 리사이즈해 전송)을
   [Pl@ntNet](https://plantnet.org) 식물 인식 API(`my-api.plantnet.org/v2/identify`)로
   전달하고, 상위 5개 후보(일반명·학명·과·일치율·참고 이미지)를 정리해 돌려줍니다.
-  Pl@ntNet은 한국어(`lang=ko`)를 지원하지 않아 일반명은 영어로 표시됩니다.
+  Pl@ntNet은 한국어(`lang=ko`)를 지원하지 않아, 학명으로 [위키데이터](https://www.wikidata.org)에
+  등록된 한국어 이름을 조회해 표시합니다(무료, 키 불필요). 한국어 이름이 등록되지 않은 종이나
+  조회에 실패한 경우에는 영어 일반명이 표시됩니다.
 - 필요한 환경변수: `PLANTNET_API_KEY` ([my.plantnet.org](https://my.plantnet.org/)에서 무료
   계정 생성 후 발급). 설정 전에는 501 응답과 함께 발급 안내 문구를 보여줍니다.
 - Pl@ntNet은 누구나 호출 가능한 공개 REST API를 제공하기 때문에 바로 연동했습니다.

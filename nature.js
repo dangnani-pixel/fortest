@@ -102,14 +102,16 @@ function blobToDataUrl(blob) {
       } else {
         resultsEl.innerHTML = data.results.map((r) => {
           const common = r.commonNames?.[0] || '';
+          const name = r.koreanName || common || r.scientificName;
+          const sub = r.koreanName && common ? `${r.scientificName} · ${common}` : r.scientificName;
           const pct = Math.round((r.score || 0) * 100);
           const img = r.image ? `<img src="${escapeHtml(r.image)}" alt="${escapeHtml(r.scientificName)}">` : '';
           return `
             <div class="result-item">
               ${img}
               <div class="result-body">
-                <div class="result-name">${escapeHtml(common || r.scientificName)}</div>
-                <div class="result-sci">${escapeHtml(r.scientificName)}</div>
+                <div class="result-name">${escapeHtml(name)}</div>
+                <div class="result-sci">${escapeHtml(sub)}</div>
                 <span class="result-score">일치율 ${pct}%</span>
               </div>
             </div>
