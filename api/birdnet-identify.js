@@ -90,10 +90,6 @@ module.exports = async (req, res) => {
     const ext = parsed.mime.includes('wav') ? 'wav' : parsed.mime.includes('ogg') ? 'ogg' : 'webm';
     const form = new FormData();
     form.append('audio', new Blob([parsed.buffer], { type: parsed.mime }), body.filename || `clip.${ext}`);
-    form.append(
-      'meta',
-      JSON.stringify({ lat: -1, lon: -1, date: new Date().toISOString().slice(0, 10), min_conf: 0.25 })
-    );
 
     const apiToken = process.env.BIRDNET_API_TOKEN;
     const resp = await fetch(serverUrl, {
