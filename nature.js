@@ -186,7 +186,10 @@ function blobToDataUrl(blob) {
     }
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // 통화용 음성 처리(소음 제거·에코 제거·자동 음량)는 새소리를 잡음으로 깎아낼 수 있어 끈다.
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+      });
       chunks = [];
       mediaRecorder = new MediaRecorder(stream);
       mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
